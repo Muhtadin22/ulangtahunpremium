@@ -100,7 +100,7 @@ export const birthdayData = {
     closing: "Dengan sepenuh hati,",
     signature: "Dari Aku 💜",
     voiceNote: {
-      audioPath: "/audio/secret-voice-note.mp3",
+      audioPath: "/audio/secret-voice-note.mp4",
       title: "Pesan Suara Rahasia Untukmu",
       subtitle: "Musik latar akan otomatis mengecil saat kamu memutarnya",
     },
