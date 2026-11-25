@@ -29,23 +29,145 @@ const BentoCakeScene = dynamic(
   }
 );
 
-// Konfigurasi presisi tiupan fisik
-const BLOW_HOLD_DURATION_MS = 1500; // Jeda 1.5 detik saat memperagakan tiupan sebelum lilin padam
-const BLOW_GRACE_WINDOW_MS = 280; // Toleransi jeda mikro antar-frame agar progres tidak mudah reset
-const BLOW_GESTURE_THRESHOLD = 0.36; // Sensitivitas bentuk bibir/pipi meniup
+const BLOW_HOLD_DURATION_MS = 1500;
+const BLOW_GRACE_WINDOW_MS = 280;
+const BLOW_GESTURE_THRESHOLD = 0.36;
+export const SNAPSHOT_STORAGE_KEY = "birthday_wish_polaroid_snapshot";
+
+// Helper menggambar sudut membulat aman di semua versi browser mobile/desktop
+function traceRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// Menangkap 1 frame kamera & menyusunnya ke template Polaroid Midnight Velvet
+function generatePolaroidDataUrl(video: HTMLVideoElement): string | null {
+  if (!video.videoWidth || !video.videoHeight) return null;
+
+  const canvas = document.createElement("canvas");
+  const W = 720;
+  const H = 900;
+  canvas.width = W;
+  canvas.height = H;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  // 1. Latar Polaroid Hitam-Ungu Velvet
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, "#1D1230");
+  bgGrad.addColorStop(0.55, "#110A1E");
+  bgGrad.addColorStop(1, "#09060E");
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. Bingkai garis halus Amethyst di sekeliling Polaroid
+  ctx.strokeStyle = "rgba(192, 132, 252, 0.32)";
+  ctx.lineWidth = 3;
+  traceRoundedRect(ctx, 14, 14, W - 28, H - 28, 28);
+  ctx.stroke();
+
+  // 3. Area Foto Candid (1:1 Center-Crop + Mirror sesuai tampilan kamera depan)
+  const photoX = 48;
+  const photoY = 54;
+  const photoSize = W - 96; // 624x624
+
+  ctx.save();
+  traceRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 22);
+  ctx.clip();
+
+  const srcMin = Math.min(video.videoWidth, video.videoHeight);
+  const sx = (video.videoWidth - srcMin) / 2;
+  const sy = (video.videoHeight - srcMin) / 2;
+
+  // Mirror horizontal agar sama seperti pantulan cermin
+  ctx.translate(photoX + photoSize, photoY);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, sx, sy, srcMin, srcMin, 0, 0, photoSize, photoSize);
+  ctx.restore();
+
+  // Vignette ungu lembut di tepi foto
+  ctx.save();
+  traceRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 22);
+  ctx.clip();
+  const vig = ctx.createRadialGradient(
+    W / 2,
+    photoY + photoSize / 2,
+    photoSize * 0.35,
+    W / 2,
+    photoY + photoSize / 2,
+    photoSize * 0.68
+  );
+  vig.addColorStop(0, "rgba(9, 6, 14, 0)");
+  vig.addColorStop(1, "rgba(18, 10, 32, 0.38)");
+  ctx.fillStyle = vig;
+  ctx.fillRect(photoX, photoY, photoSize, photoSize);
+  ctx.restore();
+
+  // Garis tepi frame foto
+  ctx.strokeStyle = "rgba(216, 180, 254, 0.35)";
+  ctx.lineWidth = 2;
+  traceRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 22);
+  ctx.stroke();
+
+  // 4. Tipografi Polaroid di Bawah Foto
+  ctx.textAlign = "center";
+
+  // Label kecil atas
+  ctx.fillStyle = "#C084FC";
+  ctx.font = '600 17px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillText("✦  BIRTHDAY WISH POLAROID  ✦", W / 2, 738);
+
+  // Judul utama: Make a Wish — 25 Nov 2026
+  ctx.fillStyle = "#F6F1FC";
+  ctx.font = 'italic 600 44px "Cormorant Garamond", Georgia, serif';
+  ctx.fillText(
+    `Make a Wish — ${birthdayData.snapshotDateLabel}`,
+    W / 2,
+    794
+  );
+
+  // Subtitle nama & usia
+  ctx.fillStyle = "rgba(216, 180, 254, 0.78)";
+  ctx.font = '500 20px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.fillText(
+    `Happy ${birthdayData.age}nd Birthday, ${birthdayData.partnerName} 💜`,
+    W / 2,
+    842
+  );
+
+  return canvas.toDataURL("image/png");
+}
 
 export default function HeroCakeSection() {
   const router = useRouter();
 
   const [isBlownOut, setIsBlownOut] = useState(false);
+  const [showShutterFlash, setShowShutterFlash] = useState(false);
   const [isOpeningCamera, setIsOpeningCamera] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isSensorReady, setIsSensorReady] = useState(false);
   const [isFaceDetected, setIsFaceDetected] = useState(false);
   const [isActivelyBlowing, setIsActivelyBlowing] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [holdProgress, setHoldProgress] = useState(0); // 0.0 - 1.0 (durasi 1.5 detik)
-  const [flameBend, setFlameBend] = useState(0); // 0.0 - 1.0 (kemiringan api lilin)
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [flameBend, setFlameBend] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -56,7 +178,7 @@ export default function HeroCakeSection() {
   const lastTimestampRef = useRef<number>(0);
   const hasTriggeredRef = useRef(false);
 
-  // Redam log INFO internal TensorFlow Lite XNNPACK agar tidak memicu Next.js Dev Error Overlay
+  // Redam log INFO internal TensorFlow Lite XNNPACK
   useEffect(() => {
     const originalConsoleError = console.error;
     console.error = (...args: unknown[]) => {
@@ -73,7 +195,6 @@ export default function HeroCakeSection() {
     };
   }, []);
 
-  // Preload model MediaPipe di latar belakang sejak halaman dimuat agar kamera instan saat diklik
   const getOrInitLandmarker = useCallback(() => {
     if (landmarkerRef.current) {
       return Promise.resolve(landmarkerRef.current);
@@ -122,9 +243,7 @@ export default function HeroCakeSection() {
   }, []);
 
   useEffect(() => {
-    getOrInitLandmarker().catch(() => {
-      // Akan dicoba ulang saat user menekan tombol kamera
-    });
+    getOrInitLandmarker().catch(() => {});
   }, [getOrInitLandmarker]);
 
   const stopCameraAndSensor = useCallback(() => {
@@ -146,10 +265,23 @@ export default function HeroCakeSection() {
     setIsActivelyBlowing(false);
   }, []);
 
-  // Dipanggil setelah user memperagakan tiupan selama jeda 1.5 detik
   const completeCandleBlow = useCallback(() => {
     if (hasTriggeredRef.current) return;
     hasTriggeredRef.current = true;
+
+    // Tangkap Candid Snapshot Polaroid tepat saat api lilin padam sebelum kamera dimatikan
+    if (videoRef.current && videoRef.current.readyState >= 2) {
+      const polaroidDataUrl = generatePolaroidDataUrl(videoRef.current);
+      if (polaroidDataUrl) {
+        setShowShutterFlash(true);
+        setTimeout(() => setShowShutterFlash(false), 320);
+        try {
+          sessionStorage.setItem(SNAPSHOT_STORAGE_KEY, polaroidDataUrl);
+        } catch {
+          // Abaikan jika browser membatasi storage
+        }
+      }
+    }
 
     stopCameraAndSensor();
     setHoldProgress(1);
@@ -166,7 +298,7 @@ export default function HeroCakeSection() {
 
     setTimeout(() => {
       router.push("/celebration");
-    }, 2200);
+    }, 2300);
   }, [router, stopCameraAndSensor]);
 
   useEffect(() => {
@@ -209,10 +341,10 @@ export default function HeroCakeSection() {
             const getScore = (name: string) =>
               categories.find((c) => c.categoryName === name)?.score ?? 0;
 
-            const mouthPucker = getScore("mouthPucker"); // Bibir mengerucut meniup
-            const mouthFunnel = getScore("mouthFunnel"); // Bibir membulat kecil
-            const cheekPuff = getScore("cheekPuff"); // Pipi menggembung
-            const jawOpen = getScore("jawOpen"); // Filter menguap/tertawa lebar
+            const mouthPucker = getScore("mouthPucker");
+            const mouthFunnel = getScore("mouthFunnel");
+            const cheekPuff = getScore("cheekPuff");
+            const jawOpen = getScore("jawOpen");
             const smileAvg =
               (getScore("mouthSmileLeft") + getScore("mouthSmileRight")) / 2;
 
@@ -231,14 +363,11 @@ export default function HeroCakeSection() {
                 accumulatedBlowMs + deltaMs
               );
             } else if (now - lastBlowActiveTime > BLOW_GRACE_WINDOW_MS) {
-              // Kurangi progres perlahan jika berhenti meniup sebelum 1.5 detik selesai
               accumulatedBlowMs = Math.max(0, accumulatedBlowMs - deltaMs * 1.2);
             }
 
             const progress = accumulatedBlowMs / BLOW_HOLD_DURATION_MS;
             setHoldProgress(progress);
-
-            // Api langsung miring saat bibir meniup, dan makin rebah mendekati 1.5 detik
             setFlameBend(
               isBlowingNow ? Math.max(0.45, progress) : progress * 0.6
             );
@@ -266,7 +395,6 @@ export default function HeroCakeSection() {
     [completeCandleBlow]
   );
 
-  // Langsung putar video kamera begitu aktif, lalu pasang sensor wajah tanpa blocking UI
   useEffect(() => {
     if (!isCameraActive || !videoRef.current || !streamRef.current) return;
 
@@ -300,12 +428,11 @@ export default function HeroCakeSection() {
     }
 
     try {
-      // Resolusi ringan 360x360 agar kamera depan HP/laptop terbuka dalam sekejap
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
-          width: { ideal: 360 },
-          height: { ideal: 360 },
+          width: { ideal: 640 },
+          height: { ideal: 640 },
           frameRate: { ideal: 30 },
         },
         audio: false,
@@ -313,7 +440,6 @@ export default function HeroCakeSection() {
 
       streamRef.current = stream;
       setIsOpeningCamera(false);
-      // Tampilkan kamera seketika tanpa menunggu model selesai inisialisasi
       setIsCameraActive(true);
     } catch {
       setIsOpeningCamera(false);
@@ -324,13 +450,25 @@ export default function HeroCakeSection() {
     }
   };
 
-  // Perhitungan SVG cincin progres melingkar di sekeliling cermin kamera
   const ringRadius = 106;
   const ringCircumference = 2 * Math.PI * ringRadius;
   const ringOffset = ringCircumference * (1 - holdProgress);
 
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 pt-12 pb-16">
+      {/* Efek Flash Kamera Lembut Saat Candid Snapshot Diambil */}
+      <AnimatePresence>
+        {showShutterFlash && (
+          <motion.div
+            initial={{ opacity: 0.85 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.32 }}
+            className="pointer-events-none fixed inset-0 z-50 bg-[#F3E8FF]"
+          />
+        )}
+      </AnimatePresence>
+
       <div className="pointer-events-none absolute top-1/3 left-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#7E22CE]/20 blur-[120px]" />
 
       {/* Header Ucapan */}
@@ -376,7 +514,6 @@ export default function HeroCakeSection() {
           </div>
         </motion.div>
 
-        {/* Cermin Kamera Deteksi Gestur Meniup + Cincin Progres 1.5 Detik */}
         <AnimatePresence>
           {isCameraActive && !isBlownOut && (
             <motion.div
@@ -387,7 +524,6 @@ export default function HeroCakeSection() {
               className="glass-velvet flex flex-col items-center rounded-3xl p-4 text-center"
             >
               <div className="relative flex h-56 w-56 items-center justify-center">
-                {/* Cincin Progres 1.5 Detik di Sekeliling Kamera */}
                 <svg
                   className="pointer-events-none absolute inset-0 h-full w-full -rotate-90"
                   viewBox="0 0 224 224"
@@ -414,7 +550,6 @@ export default function HeroCakeSection() {
                   />
                 </svg>
 
-                {/* Lingkaran Video Kamera */}
                 <div
                   className={`relative h-48 w-48 overflow-hidden rounded-full border transition-colors duration-200 ${
                     isActivelyBlowing
@@ -435,7 +570,6 @@ export default function HeroCakeSection() {
                 </div>
               </div>
 
-              {/* Status & Instruksi Real-Time */}
               <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#E9D5FF]">
                 {!isSensorReady ? (
                   <>
@@ -461,7 +595,7 @@ export default function HeroCakeSection() {
               </div>
 
               <p className="mt-1.5 max-w-[225px] text-[11px] leading-relaxed text-[#D8B4FE]/75">
-                Kerucutkan bibir seperti meniup lilin dan tahan selama 1,5 detik hingga padam.
+                Kerucutkan bibir seperti meniup lilin dan tahan 1,5 detik. Momen candid-mu akan otomatis diabadikan!
               </p>
             </motion.div>
           )}
@@ -491,7 +625,7 @@ export default function HeroCakeSection() {
                 ) : (
                   <>
                     <Camera className="h-4 w-4" />
-                    <span>Tiup Lilin dengan Kamera</span>
+                    <span>{birthdayData.hero.enableCameraLabel}</span>
                   </>
                 )}
               </button>
@@ -508,7 +642,7 @@ export default function HeroCakeSection() {
               onClick={completeCandleBlow}
               className="mt-3.5 text-xs font-medium text-[#D8B4FE]/65 underline decoration-[#C084FC]/40 underline-offset-4 transition-colors hover:text-[#F6F1FC] cursor-pointer"
             >
-              Atau ketuk di sini untuk tiup manual
+              {birthdayData.hero.manualFallbackLabel}
             </button>
           </>
         )}

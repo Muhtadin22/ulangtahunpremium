@@ -23,7 +23,14 @@ export const birthdayData = {
   senderName: "Kamu yang Selalu Mengagumimu",
   age: 22,
   birthdayDate: "25 November 2026",
+  snapshotDateLabel: "25 Nov 2026", // Ditulis di bingkai Polaroid Candid
   audioPath: "/audio/birthday-bgm.mp3",
+
+  // Kontak tujuan pengirim harapan rahasia (tanpa backend/database)
+  contact: {
+    whatsappNumber: "085697259015", // Ganti dengan nomor WhatsApp kamu
+    email: "emailkamu@gmail.com",    // Opsional: ganti dengan email kamu
+  },
 
   intro: {
     badge: "Midnight Celebration For You",
@@ -32,18 +39,18 @@ export const birthdayData = {
     ctaLabel: "Buka Kejutan",
   },
 
-hero: {
+  hero: {
     eyebrow: "Make A Wish Ritual",
     subtitle: "Putar kue malam ini sesukamu, nyalakan kamera, pejamkan mata, lalu peragakan tiupan ke arah layar.",
     cakeTopText: "HBD 22",
-    enableCameraLabel: "Nyalakan Kamera & Tiup Lilin",
+    enableCameraLabel: "Tiup Lilin dengan Kamera",
     loadingModelLabel: "Menyiapkan Sensor Wajah...",
     noFaceHint: "Arahkan wajahmu ke dalam lingkaran cermin...",
-    listeningHint: "Wajah terdeteksi — kerucutkan bibir & tiup lilinnya sekarang!",
+    listeningHint: "Wajah terdeteksi — kerucutkan bibir & tiup lilinnya!",
     manualFallbackLabel: "Atau ketuk di sini untuk tiup manual",
     wishMessageTitle: "Make a Wish Terkirim ✨",
     wishMessageBody:
-      "Semoga semua doa baikmu malam ini dikabulkan semesta. Membuka halaman kenangan kita...",
+      "Momen tiup lilinmu sudah tersimpan. Membuka halaman kenangan kita...",
   },
 
   memories: [
@@ -92,6 +99,23 @@ hero: {
     ],
     closing: "Dengan sepenuh hati,",
     signature: "Dari Aku 💜",
+    voiceNote: {
+      audioPath: "/audio/secret-voice-note.mp3",
+      title: "Pesan Suara Rahasia Untukmu",
+      subtitle: "Musik latar akan otomatis mengecil saat kamu memutarnya",
+    },
+  },
+
+  timeCapsule: {
+    eyebrow: "Kapsul Waktu • Usia 22",
+    title: "Tulis Harapan Terbesarmu Tahun Ini",
+    subtitle:
+      "Ketik satu harapan yang paling ingin kamu wujudkan di usia baru ini. Begitu dikunci dalam kristal ungu, kapsul ini siap dikirim sebagai rahasia kecil kita.",
+    placeholder: "Tulis harapan atau hal yang paling kamu inginkan tahun ini...",
+    lockButtonLabel: "Kunci Harapan ke Semesta",
+    lockedTitle: "Harapan Terkunci dalam Kristal Amethyst ✨",
+    lockedSubtitle:
+      "Kirim kapsul terenkripsi ini agar aku ikut mendoakan dan diam-diam membantumu mewujudkannya.",
   },
 
   wishCards: [

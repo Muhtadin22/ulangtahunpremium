@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Sparkles } from "lucide-react";
+import WishSnapshotPolaroid from "@/components/WishSnapshotPolaroid";
 import PolaroidGallery from "@/components/PolaroidGallery";
 import LoveLetterEnvelope from "@/components/LoveLetterEnvelope";
 import WishCardsGrid from "@/components/WishCardsGrid";
+import TimeCapsuleWish from "@/components/TimeCapsuleWish";
 import ClosingSection from "@/components/ClosingSection";
 import { birthdayData, DREAMY_EASE } from "@/data/birthdayData";
 
@@ -57,14 +59,22 @@ export default function CelebrationPage() {
         </motion.div>
       </section>
 
+      {/* 1. Hasil Candid Polaroid Saat Tiup Lilin */}
+      <WishSnapshotPolaroid />
+
       <div className="mx-auto h-px w-48 bg-gradient-to-r from-transparent via-[#C084FC]/35 to-transparent" />
       <PolaroidGallery />
 
       <div className="mx-auto h-px w-48 bg-gradient-to-r from-transparent via-[#C084FC]/35 to-transparent" />
+      {/* 2. Surat Cinta + Voice Note Rahasia */}
       <LoveLetterEnvelope />
 
       <div className="mx-auto h-px w-48 bg-gradient-to-r from-transparent via-[#C084FC]/35 to-transparent" />
       <WishCardsGrid />
+
+      <div className="mx-auto h-px w-48 bg-gradient-to-r from-transparent via-[#C084FC]/35 to-transparent" />
+      {/* 3. Kapsul Waktu & Pengirim Harapan Rahasia */}
+      <TimeCapsuleWish />
 
       <ClosingSection onReplay={handleReplay} />
     </motion.main>

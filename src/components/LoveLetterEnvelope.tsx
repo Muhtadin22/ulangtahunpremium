@@ -1,9 +1,180 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Heart, MailOpen } from "lucide-react";
+import { Heart, MailOpen, Mic, Pause, Play } from "lucide-react";
 import { birthdayData, DREAMY_EASE } from "@/data/birthdayData";
+import { useBirthdayAudio } from "@/context/AudioContext";
+
+const WAVE_BAR_HEIGHTS = [32, 65, 45, 88, 55, 100, 70, 42, 92, 60, 78, 48, 84, 52, 68, 36];
+
+function formatDuration(sec: number): string {
+  if (!Number.isFinite(sec) || sec < 0) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function SecretVoiceNotePlayer({ isEnvelopeOpen }: { isEnvelopeOpen: boolean }) {
+  const { duckVolume } = useBirthdayAudio();
+  const voiceRef = useRef<HTMLAudioElement | null>(null);
+
+  const [isVoicePlaying, setIsVoicePlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [audioError, setAudioError] = useState(false);
+
+  // Kembalikan volume BGM jika amplop ditutup atau komponen di-unmount
+  useEffect(() => {
+    if (!isEnvelopeOpen && voiceRef.current && !voiceRef.current.paused) {
+      voiceRef.current.pause();
+      setIsVoicePlaying(false);
+      duckVolume(false);
+    }
+  }, [isEnvelopeOpen, duckVolume]);
+
+  useEffect(() => {
+    return () => {
+      duckVolume(false);
+    };
+  }, [duckVolume]);
+
+  const toggleVoiceNote = () => {
+    const audio = voiceRef.current;
+    if (!audio) return;
+
+    if (isVoicePlaying) {
+      audio.pause();
+      setIsVoicePlaying(false);
+      duckVolume(false);
+    } else {
+      setAudioError(false);
+      audio.volume = 1.0;
+      audio
+        .play()
+        .then(() => {
+          setIsVoicePlaying(true);
+          duckVolume(true); // Otomatis kecilkan BGM agar suara terdengar jernih
+        })
+        .catch(() => {
+          setAudioError(true);
+          setIsVoicePlaying(false);
+          duckVolume(false);
+        });
+    }
+  };
+
+  const progressPct = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.75,
+        delay: 0.45 + birthdayData.loveLetter.paragraphs.length * 0.16,
+        ease: DREAMY_EASE,
+      }}
+      className="mt-8 rounded-2xl border border-[#C084FC]/30 bg-[#120B1F]/80 p-4 sm:p-5"
+    >
+      <audio
+        ref={voiceRef}
+        src={birthdayData.loveLetter.voiceNote.audioPath}
+        preload="metadata"
+        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+        onEnded={() => {
+          setIsVoicePlaying(false);
+          setCurrentTime(0);
+          duckVolume(false);
+        }}
+        onError={() => {
+          setAudioError(true);
+          setIsVoicePlaying(false);
+          duckVolume(false);
+        }}
+      />
+
+      <div className="flex items-center gap-4">
+        {/* Tombol Play / Pause */}
+        <button
+          type="button"
+          onClick={toggleVoiceNote}
+          aria-label={isVoicePlaying ? "Jeda pesan suara" : "Putar pesan suara"}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#9333EA] to-[#6B21A8] text-white shadow-[0_6px_20px_rgba(147,51,234,0.6)] ring-1 ring-[#E9D5FF]/35 transition-transform duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          {isVoicePlaying ? (
+            <Pause className="h-5 w-5 fill-white" />
+          ) : (
+            <Play className="ml-0.5 h-5 w-5 fill-white" />
+          )}
+        </button>
+
+        {/* Info + Visualizer Gelombang Ungu */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <p className="flex items-center gap-1.5 truncate text-xs font-semibold tracking-wide text-[#F6F1FC] sm:text-sm">
+              <Mic className="h-3.5 w-3.5 shrink-0 text-[#C084FC]" />
+              <span className="truncate">
+                {birthdayData.loveLetter.voiceNote.title}
+              </span>
+            </p>
+            <span className="shrink-0 font-mono text-[11px] text-[#D8B4FE]/75">
+              {formatDuration(currentTime)} / {formatDuration(duration)}
+            </span>
+          </div>
+
+          {/* Visualizer Gelombang Ungu Animasi */}
+          <div className="mt-2.5 flex h-7 items-center gap-1">
+            {WAVE_BAR_HEIGHTS.map((peak, idx) => {
+              const barPct = ((idx + 1) / WAVE_BAR_HEIGHTS.length) * 100;
+              const isPassed = barPct <= progressPct;
+
+              return (
+                <motion.span
+                  key={idx}
+                  className={`flex-1 rounded-full transition-colors duration-200 ${
+                    isPassed || isVoicePlaying
+                      ? "bg-gradient-to-t from-[#7E22CE] via-[#A855F7] to-[#E9D5FF]"
+                      : "bg-[#C084FC]/25"
+                  }`}
+                  animate={
+                    isVoicePlaying
+                      ? {
+                          height: [
+                            `${Math.max(22, peak * 0.35)}%`,
+                            `${peak}%`,
+                            `${Math.max(25, peak * 0.45)}%`,
+                          ],
+                        }
+                      : { height: `${Math.max(20, peak * 0.35)}%` }
+                  }
+                  transition={
+                    isVoicePlaying
+                      ? {
+                          duration: 0.65 + (idx % 4) * 0.14,
+                          repeat: Infinity,
+                          repeatType: "mirror",
+                          ease: "easeInOut",
+                          delay: idx * 0.04,
+                        }
+                      : { duration: 0.35 }
+                  }
+                />
+              );
+            })}
+          </div>
+
+          <p className="mt-1.5 text-[11px] text-[#D8B4FE]/65">
+            {audioError
+              ? `Letakkan rekaman suaramu di public${birthdayData.loveLetter.voiceNote.audioPath}`
+              : birthdayData.loveLetter.voiceNote.subtitle}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function LoveLetterEnvelope() {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +207,6 @@ export default function LoveLetterEnvelope() {
           className="relative w-full max-w-md cursor-pointer focus:outline-none"
         >
           <div className="relative mx-auto h-56 w-full overflow-hidden rounded-3xl border border-[#C084FC]/30 bg-gradient-to-br from-[#231538] via-[#170E26] to-[#2E194A] shadow-[0_24px_55px_-14px_rgba(0,0,0,0.85),0_0_30px_-8px_rgba(147,51,234,0.35)] sm:h-64">
-            {/* Tutup Amplop (Flap) */}
             <motion.div
               animate={{
                 rotateX: isOpen ? 180 : 0,
@@ -55,7 +225,6 @@ export default function LoveLetterEnvelope() {
               />
             </motion.div>
 
-            {/* Garis Lipatan Bawah Amplop */}
             <div
               className="absolute inset-0 z-10 opacity-40"
               style={{
@@ -64,7 +233,6 @@ export default function LoveLetterEnvelope() {
               }}
             />
 
-            {/* Segel Lilin Royal Amethyst di Tengah */}
             <motion.div
               animate={{ scale: isOpen ? 0.85 : 1, y: isOpen ? 14 : 0 }}
               transition={{ duration: 0.6, ease: DREAMY_EASE }}
@@ -77,7 +245,6 @@ export default function LoveLetterEnvelope() {
               )}
             </motion.div>
 
-            {/* Teks Petunjuk */}
             <p className="absolute right-0 bottom-5 left-0 z-20 text-center text-xs font-medium tracking-wide text-[#D8B4FE]/85">
               {isOpen
                 ? "Ketuk lagi untuk menutup amplop"
@@ -86,7 +253,7 @@ export default function LoveLetterEnvelope() {
           </div>
         </motion.button>
 
-        {/* Kertas Surat dengan Staggered Fade-in */}
+        {/* Kertas Surat + Voice Note Rahasia */}
         <AnimatePresence>
           {isOpen && (
             <motion.article
@@ -139,6 +306,9 @@ export default function LoveLetterEnvelope() {
                   {birthdayData.loveLetter.signature}
                 </p>
               </motion.div>
+
+              {/* Pemutar Voice Note Rahasia dengan Auto-Ducking BGM */}
+              <SecretVoiceNotePlayer isEnvelopeOpen={isOpen} />
             </motion.article>
           )}
         </AnimatePresence>
