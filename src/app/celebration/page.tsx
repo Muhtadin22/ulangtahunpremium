@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Sparkles } from "lucide-react";
@@ -11,11 +10,10 @@ import LoveLetterEnvelope from "@/components/LoveLetterEnvelope";
 import WishCardsGrid from "@/components/WishCardsGrid";
 import TimeCapsuleWish from "@/components/TimeCapsuleWish";
 import ClosingSection from "@/components/ClosingSection";
+import { SNAPSHOT_STORAGE_KEY } from "@/components/HeroCakeSection";
 import { birthdayData, DREAMY_EASE } from "@/data/birthdayData";
 
 export default function CelebrationPage() {
-  const router = useRouter();
-
   useEffect(() => {
     window.scrollTo({ top: 0 });
     confetti({
@@ -28,7 +26,14 @@ export default function CelebrationPage() {
   }, []);
 
   const handleReplay = () => {
-    router.push("/");
+    try {
+      sessionStorage.removeItem(SNAPSHOT_STORAGE_KEY);
+    } catch {
+      // Abaikan jika storage tidak tersedia
+    }
+
+    // Full browser reload ke halaman awal agar seluruh state 3D & lilin menyala kembali
+    window.location.href = "/";
   };
 
   return (
