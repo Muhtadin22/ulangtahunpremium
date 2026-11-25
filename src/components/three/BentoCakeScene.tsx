@@ -13,7 +13,7 @@ import {
 
 interface BentoCakeSceneProps {
   isBlownOut: boolean;
-  blowIntensity?: number; // 0.0 - 1.0 berdasarkan gestur fisik mulut di kamera
+  blowIntensity?: number;
 }
 
 function SpiralCandle({
@@ -68,7 +68,6 @@ function SpiralCandle({
         Math.max(0, nextScale + flicker * 0.5)
       );
 
-      // Api terdorong miring mengikuti gerakan tiupan fisik user
       flameRef.current.rotation.x = THREE.MathUtils.lerp(
         flameRef.current.rotation.x,
         -blowIntensity * 0.85,
@@ -100,69 +99,76 @@ function SpiralCandle({
 
   return (
     <group position={[0, 0.62, 0]}>
+      {/* Dudukan Lilin Silver Starlight */}
       <mesh position={[0, 0.03, 0]}>
         <cylinderGeometry args={[0.095, 0.11, 0.06, 24]} />
-        <meshStandardMaterial color="#C084FC" metalness={0.6} roughness={0.25} />
+        <meshStandardMaterial color="#CBD5E1" metalness={0.75} roughness={0.2} />
       </mesh>
 
+      {/* Batang Lilin Ice White */}
       <mesh position={[0, 0.48, 0]} castShadow>
         <cylinderGeometry args={[0.062, 0.066, 0.88, 28]} />
         <meshPhysicalMaterial
-          color="#F3E8FF"
-          roughness={0.25}
-          clearcoat={0.5}
+          color="#F4F7FC"
+          roughness={0.22}
+          clearcoat={0.55}
         />
       </mesh>
 
+      {/* Aksen Spiral Celestial Navy */}
       <mesh geometry={spiralGeometry} position={[0, 0.04, 0]}>
         <meshPhysicalMaterial
-          color="#7E22CE"
-          roughness={0.2}
-          metalness={0.35}
-          clearcoat={0.8}
+          color="#2B4C9B"
+          roughness={0.18}
+          metalness={0.45}
+          clearcoat={0.85}
         />
       </mesh>
 
+      {/* Sumbu */}
       <mesh position={[0, 0.96, 0]}>
         <cylinderGeometry args={[0.008, 0.008, 0.1, 8]} />
-        <meshStandardMaterial color="#1E1B2E" />
+        <meshStandardMaterial color="#0F172A" />
       </mesh>
 
+      {/* Api Lilin Hangat */}
       <group ref={flameRef} position={[0, 1.08, 0]}>
         <mesh scale={[0.78, 1.38, 0.78]}>
           <sphereGeometry args={[0.092, 20, 20]} />
-          <meshBasicMaterial color="#F59E0B" transparent opacity={0.92} />
+          <meshBasicMaterial color="#FBBF24" transparent opacity={0.92} />
         </mesh>
         <mesh position={[0, -0.02, 0]} scale={[0.45, 0.85, 0.45]}>
           <sphereGeometry args={[0.075, 16, 16]} />
-          <meshBasicMaterial color="#FEF3C7" />
+          <meshBasicMaterial color="#FEF9C3" />
         </mesh>
       </group>
 
+      {/* Cahaya Api */}
       <pointLight
         ref={lightRef}
         position={[0, 1.2, 0]}
-        color="#FBBF24"
+        color="#FDE68A"
         intensity={3.2}
         distance={5.5}
         decay={2}
       />
 
+      {/* Asap Perak Lembut Setelah Ditiup */}
       <group ref={smokeRef} position={[0, 1.05, 0]} visible={false}>
         <mesh position={[0.02, 0.08, 0]}>
           <sphereGeometry args={[0.038, 12, 12]} />
-          <meshStandardMaterial color="#D8B4FE" transparent opacity={0.4} roughness={1} />
+          <meshStandardMaterial color="#E2E8F0" transparent opacity={0.42} roughness={1} />
         </mesh>
         <mesh position={[-0.03, 0.2, 0.02]}>
           <sphereGeometry args={[0.05, 12, 12]} />
-          <meshStandardMaterial color="#C084FC" transparent opacity={0.28} roughness={1} />
+          <meshStandardMaterial color="#9BB1E8" transparent opacity={0.3} roughness={1} />
         </mesh>
       </group>
     </group>
   );
 }
 
-function MidnightVelvetCake({
+function MidnightStarlightCake({
   isBlownOut,
   blowIntensity = 0,
 }: {
@@ -179,7 +185,7 @@ function MidnightVelvetCake({
       return {
         x: Math.cos(angle) * radius,
         z: Math.sin(angle) * radius,
-        color: i % 2 === 0 ? "#A855F7" : "#D8B4FE",
+        color: i % 2 === 0 ? "#7AA2F7" : "#CBD5E1",
       };
     });
   }, []);
@@ -196,7 +202,7 @@ function MidnightVelvetCake({
     });
   }, []);
 
-  const amethystPearls = useMemo(() => {
+  const starlightPearls = useMemo(() => {
     const count = 10;
     const radius = 0.68;
     return Array.from({ length: count }, (_, i) => {
@@ -204,7 +210,7 @@ function MidnightVelvetCake({
       return {
         x: Math.cos(angle) * radius,
         z: Math.sin(angle) * radius,
-        color: i % 2 === 0 ? "#C084FC" : "#F3E8FF",
+        color: i % 2 === 0 ? "#E2E8F0" : "#9BB1E8",
       };
     });
   }, []);
@@ -217,89 +223,100 @@ function MidnightVelvetCake({
   return (
     <Float speed={1.5} rotationIntensity={0.08} floatIntensity={0.2}>
       <group ref={cakeGroupRef} position={[0, -0.32, 0]}>
+        {/* Piring Keramik Abyssal Navy */}
         <mesh position={[0, -0.44, 0]} receiveShadow>
           <cylinderGeometry args={[1.68, 1.46, 0.12, 48]} />
           <meshPhysicalMaterial
-            color="#120D1D"
+            color="#0A1022"
             roughness={0.16}
-            metalness={0.25}
-            clearcoat={0.9}
-            clearcoatRoughness={0.1}
+            metalness={0.3}
+            clearcoat={0.92}
+            clearcoatRoughness={0.08}
           />
         </mesh>
 
+        {/* Rim Piring Platinum Silver */}
         <mesh position={[0, -0.375, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[1.66, 0.022, 16, 64]} />
-          <meshStandardMaterial color="#C084FC" metalness={0.75} roughness={0.22} />
+          <meshStandardMaterial color="#CBD5E1" metalness={0.85} roughness={0.18} />
         </mesh>
 
+        {/* Kertas Alas Bento Midnight Indigo */}
         <mesh position={[0, -0.365, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[1.38, 40]} />
-          <meshStandardMaterial color="#1F1533" roughness={0.8} />
+          <meshStandardMaterial color="#121C38" roughness={0.8} />
         </mesh>
 
+        {/* Badan Utama Bento Cake (Deep Midnight Navy) */}
         <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[1.22, 1.24, 0.96, 56]} />
-          <meshStandardMaterial color="#2D1D47" roughness={0.52} metalness={0.08} />
+          <meshStandardMaterial color="#17254D" roughness={0.5} metalness={0.1} />
         </mesh>
 
+        {/* Lapisan Frosting Atas Starlight Ice */}
         <mesh position={[0, 0.6, 0]} castShadow>
           <cylinderGeometry args={[1.22, 1.22, 0.08, 56]} />
-          <meshStandardMaterial color="#E9D5FF" roughness={0.45} />
+          <meshStandardMaterial color="#DCE6FA" roughness={0.42} />
         </mesh>
 
+        {/* Tepi Bulat Halus di Atas Kue */}
         <mesh position={[0, 0.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[1.18, 0.06, 16, 56]} />
-          <meshStandardMaterial color="#E9D5FF" roughness={0.45} />
+          <meshStandardMaterial color="#DCE6FA" roughness={0.42} />
         </mesh>
 
+        {/* Piping Krim Periwinkle & Silver Melingkar Atas */}
         {topPiping.map((pip, idx) => (
           <group key={idx} position={[pip.x, 0.67, pip.z]}>
             <mesh castShadow>
               <sphereGeometry args={[0.145, 20, 20]} />
-              <meshStandardMaterial color={pip.color} roughness={0.42} />
+              <meshStandardMaterial color={pip.color} roughness={0.4} />
             </mesh>
             <mesh position={[0, 0.11, 0]}>
               <coneGeometry args={[0.09, 0.13, 16]} />
-              <meshStandardMaterial color={pip.color} roughness={0.42} />
+              <meshStandardMaterial color={pip.color} roughness={0.4} />
             </mesh>
           </group>
         ))}
 
+        {/* Piping Krim Melingkar Bawah */}
         {bottomPiping.map((pip, idx) => (
           <mesh key={idx} position={[pip.x, -0.31, pip.z]}>
             <sphereGeometry args={[0.11, 16, 16]} />
-            <meshStandardMaterial color="#9333EA" roughness={0.45} />
+            <meshStandardMaterial color="#4F75D1" roughness={0.45} />
           </mesh>
         ))}
 
-        {amethystPearls.map((pearl, idx) => (
+        {/* Mutiara Kristal Silver & Starlight di Atas Kue */}
+        {starlightPearls.map((pearl, idx) => (
           <mesh key={idx} position={[pearl.x, 0.65, pearl.z]}>
             <sphereGeometry args={[0.048, 16, 16]} />
             <meshPhysicalMaterial
               color={pearl.color}
-              roughness={0.1}
-              metalness={0.35}
+              roughness={0.08}
+              metalness={0.45}
               clearcoat={1}
             />
           </mesh>
         ))}
 
+        {/* Pita Satin Celestial Blue & Silver di Depan Kue */}
         <group position={[0, 0.18, 1.24]}>
           <mesh position={[-0.12, 0, 0]} rotation={[0, 0, 0.35]}>
             <torusGeometry args={[0.1, 0.032, 12, 24]} />
-            <meshPhysicalMaterial color="#A855F7" roughness={0.3} clearcoat={0.6} />
+            <meshPhysicalMaterial color="#7AA2F7" roughness={0.28} clearcoat={0.65} />
           </mesh>
           <mesh position={[0.12, 0, 0]} rotation={[0, 0, -0.35]}>
             <torusGeometry args={[0.1, 0.032, 12, 24]} />
-            <meshPhysicalMaterial color="#A855F7" roughness={0.3} clearcoat={0.6} />
+            <meshPhysicalMaterial color="#7AA2F7" roughness={0.28} clearcoat={0.65} />
           </mesh>
           <mesh>
             <sphereGeometry args={[0.055, 16, 16]} />
-            <meshPhysicalMaterial color="#C084FC" roughness={0.25} clearcoat={0.7} />
+            <meshPhysicalMaterial color="#E2E8F0" roughness={0.2} metalness={0.5} clearcoat={0.8} />
           </mesh>
         </group>
 
+        {/* Lilin Spiral */}
         <SpiralCandle isBlownOut={isBlownOut} blowIntensity={blowIntensity} />
       </group>
     </Float>
@@ -318,30 +335,31 @@ export default function BentoCakeScene({
       gl={{ antialias: true, alpha: true }}
       className="h-full w-full touch-pan-y"
     >
-      <ambientLight intensity={0.75} color="#2E1065" />
+      <ambientLight intensity={0.8} color="#172554" />
       <directionalLight
         position={[4, 6, 4]}
-        intensity={1.85}
-        color="#F3E8FF"
+        intensity={1.9}
+        color="#F4F7FC"
         castShadow
       />
-      <directionalLight position={[-4, 3, -3]} intensity={1.35} color="#9333EA" />
-      <pointLight position={[0, 1.5, -2.5]} intensity={1.2} color="#A855F7" />
+      <directionalLight position={[-4, 3, -3]} intensity={1.35} color="#4F75D1" />
+      <pointLight position={[0, 1.5, -2.5]} intensity={1.2} color="#9BB1E8" />
 
       <Environment preset="night" environmentIntensity={0.55} />
 
-      <MidnightVelvetCake
+      <MidnightStarlightCake
         isBlownOut={isBlownOut}
         blowIntensity={blowIntensity}
       />
 
+      {/* Partikel Bintang Perak & Starlight */}
       <Sparkles
-        count={isBlownOut ? 85 : 28}
+        count={isBlownOut ? 90 : 32}
         scale={isBlownOut ? [4.8, 3.6, 4.8] : [3.2, 2.2, 3.2]}
         size={isBlownOut ? 4.4 : 2.4}
         speed={isBlownOut ? 1.15 : 0.3}
-        opacity={isBlownOut ? 0.95 : 0.6}
-        color={isBlownOut ? "#D8B4FE" : "#A855F7"}
+        opacity={isBlownOut ? 0.95 : 0.65}
+        color={isBlownOut ? "#E2E8F0" : "#9BB1E8"}
       />
 
       <ContactShadows

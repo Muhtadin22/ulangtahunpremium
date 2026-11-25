@@ -18,21 +18,21 @@ export default function AudioControl() {
       transition={{ duration: 0.6, ease: DREAMY_EASE }}
       onClick={toggleMute}
       aria-label={isMuted ? "Aktifkan musik" : "Bisukan musik"}
-      className="fixed bottom-5 right-5 z-50 glass-velvet flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-[#F6F1FC] transition-transform duration-300 hover:scale-105 hover:border-[#C084FC]/50 active:scale-95 cursor-pointer"
+      className="fixed bottom-5 right-5 z-50 glass-celestial flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-[#F4F7FC] transition-transform duration-300 hover:scale-105 hover:border-[#9BB1E8]/50 active:scale-95 cursor-pointer"
     >
       {isMuted ? (
         <>
-          <VolumeX className="h-4 w-4 text-[#C084FC]" />
-          <span className="hidden sm:inline text-[#D8B4FE]">Musik Mati</span>
+          <VolumeX className="h-4 w-4 text-[#9BB1E8]" />
+          <span className="hidden sm:inline text-[#A3B4D4]">Musik Mati</span>
         </>
       ) : (
         <>
           <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#C084FC] opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#A855F7]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#9BB1E8] opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#7AA2F7]" />
           </span>
-          <Volume2 className="h-4 w-4 text-[#C084FC]" />
-          <span className="hidden sm:inline text-[#F6F1FC]">Musik Aktif</span>
+          <Volume2 className="h-4 w-4 text-[#9BB1E8]" />
+          <span className="hidden sm:inline text-[#F4F7FC]">Musik Aktif</span>
         </>
       )}
     </motion.button>

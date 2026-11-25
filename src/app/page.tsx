@@ -17,7 +17,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="relative min-h-screen bg-[radial-gradient(ellipse_at_top,#170E26_0%,#09060E_55%,#06040A_100%)] text-[#F6F1FC]">
+    <main className="relative min-h-screen bg-[radial-gradient(ellipse_at_top,#0F1A38_0%,#050811_58%,#03050B_100%)] text-[#F4F7FC]">
       <AnimatePresence mode="wait">
         {!isOpened && (
           <IntroOverlay

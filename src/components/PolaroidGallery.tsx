@@ -17,14 +17,14 @@ import {
 
 function StickerBadge({ type }: { type: PolaroidMemory["sticker"] }) {
   const icons = {
-    heart: <Heart className="h-4 w-4 fill-[#A855F7] text-[#D8B4FE]" />,
-    sparkle: <Sparkles className="h-4 w-4 text-[#C084FC]" />,
-    ribbon: <Ribbon className="h-4 w-4 text-[#D8B4FE]" />,
-    star: <Star className="h-4 w-4 fill-[#9333EA] text-[#E9D5FF]" />,
+    heart: <Heart className="h-4 w-4 fill-[#7AA2F7] text-[#E2E8F0]" />,
+    sparkle: <Sparkles className="h-4 w-4 text-[#9BB1E8]" />,
+    ribbon: <Ribbon className="h-4 w-4 text-[#CBD5E1]" />,
+    star: <Star className="h-4 w-4 fill-[#4F75D1] text-[#E2E8F0]" />,
   };
 
   return (
-    <div className="absolute -top-3 -right-3 flex h-9 w-9 items-center justify-center rounded-full border border-[#C084FC]/35 bg-[#191129] shadow-[0_6px_16px_rgba(0,0,0,0.6)]">
+    <div className="absolute -top-3 -right-3 flex h-9 w-9 items-center justify-center rounded-full border border-[#9BB1E8]/35 bg-[#0C142B] shadow-[0_6px_16px_rgba(0,0,0,0.6)]">
       {icons[type]}
     </div>
   );
@@ -85,16 +85,15 @@ function PolaroidCard({
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         onClick={() => onSelect(memory)}
-        className="relative cursor-pointer rounded-3xl border border-[#C084FC]/25 bg-gradient-to-b from-[#1B122B]/90 to-[#110B1C]/95 p-3.5 pb-6 shadow-[0_20px_45px_-14px_rgba(0,0,0,0.85),0_0_24px_-8px_rgba(147,51,234,0.28)] backdrop-blur-md"
+        className="relative cursor-pointer rounded-3xl border border-[#9BB1E8]/25 bg-gradient-to-b from-[#111B38]/90 to-[#080D1C]/95 p-3.5 pb-6 shadow-[0_20px_45px_-14px_rgba(0,0,0,0.85),0_0_24px_-8px_rgba(122,162,247,0.22)] backdrop-blur-md"
       >
-        {/* Selotip Washi Amethyst Translucent */}
-        <div className="pointer-events-none absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 -rotate-2 rounded-sm border border-[#E9D5FF]/20 bg-[#9333EA]/40 backdrop-blur-xs" />
+        {/* Selotip Washi Starlight Translucent */}
+        <div className="pointer-events-none absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 -rotate-2 rounded-sm border border-[#E2E8F0]/20 bg-[#4F75D1]/35 backdrop-blur-xs" />
 
-        {/* Stiker Mini */}
         <StickerBadge type={memory.sticker} />
 
         {/* Bingkai Foto */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-[#C084FC]/15 bg-gradient-to-br from-[#261740] via-[#150E22] to-[#341C59]">
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-[#9BB1E8]/15 bg-gradient-to-br from-[#17254D] via-[#0C142B] to-[#1E3369]">
           {!imgError ? (
             <img
               src={memory.image}
@@ -104,10 +103,10 @@ function PolaroidCard({
             />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
-              <Heart className="h-8 w-8 text-[#C084FC]/60" />
-              <p className="mt-2 text-xs text-[#D8B4FE]/65">
+              <Heart className="h-8 w-8 text-[#9BB1E8]/60" />
+              <p className="mt-2 text-xs text-[#A3B4D4]">
                 Letakkan foto di <br />
-                <code className="font-mono text-[11px] text-[#E9D5FF]">{memory.image}</code>
+                <code className="font-mono text-[11px] text-[#E2E8F0]">{memory.image}</code>
               </p>
             </div>
           )}
@@ -115,10 +114,10 @@ function PolaroidCard({
 
         {/* Caption Polaroid */}
         <div className="mt-4 px-1 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.2em] text-[#C084FC] uppercase">
+          <p className="text-[11px] font-semibold tracking-[0.2em] text-[#9BB1E8] uppercase">
             {memory.date}
           </p>
-          <p className="mt-1 font-serif text-lg leading-snug text-[#F6F1FC]">
+          <p className="mt-1 font-serif text-lg leading-snug text-[#F4F7FC]">
             {memory.caption}
           </p>
         </div>
@@ -141,13 +140,13 @@ export default function PolaroidGallery() {
         transition={{ duration: 0.8, ease: DREAMY_EASE }}
         className="mx-auto max-w-xl text-center"
       >
-        <span className="text-xs font-semibold tracking-[0.28em] text-[#C084FC] uppercase">
-          Velvet Scrapbook
+        <span className="text-xs font-semibold tracking-[0.28em] text-[#9BB1E8] uppercase">
+          Starlight Scrapbook
         </span>
-        <h2 className="mt-3 font-serif text-4xl font-semibold text-[#F6F1FC] sm:text-5xl">
+        <h2 className="mt-3 font-serif text-4xl font-semibold text-[#F4F7FC] sm:text-5xl">
           Potongan Momen Favorit Kita
         </h2>
-        <p className="mt-3 text-sm text-[#D8B4FE]/75 sm:text-base">
+        <p className="mt-3 text-sm text-[#A3B4D4] sm:text-base">
           Sentuh atau klik tiap polaroid untuk melihat kenangan lebih dekat.
         </p>
       </motion.div>
@@ -162,7 +161,6 @@ export default function PolaroidGallery() {
         ))}
       </div>
 
-      {/* Modal Zoom Dark Velvet */}
       <AnimatePresence>
         {selectedMemory && (
           <motion.div
@@ -171,7 +169,7 @@ export default function PolaroidGallery() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: DREAMY_EASE }}
             onClick={() => setSelectedMemory(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#050308]/80 p-5 backdrop-blur-lg"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#03050B]/85 p-5 backdrop-blur-lg"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -179,17 +177,17 @@ export default function PolaroidGallery() {
               exit={{ opacity: 0, scale: 0.92, y: 16 }}
               transition={{ duration: 0.45, ease: DREAMY_EASE }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-velvet relative w-full max-w-md overflow-hidden rounded-3xl p-4 pb-6"
+              className="glass-celestial relative w-full max-w-md overflow-hidden rounded-3xl p-4 pb-6"
             >
               <button
                 onClick={() => setSelectedMemory(null)}
                 aria-label="Tutup pratinjau"
-                className="absolute top-6 right-6 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#C084FC]/30 bg-[#140E21]/85 text-[#F6F1FC] shadow-lg backdrop-blur-sm transition-transform hover:scale-105 cursor-pointer"
+                className="absolute top-6 right-6 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#9BB1E8]/30 bg-[#0A1022]/85 text-[#F4F7FC] shadow-lg backdrop-blur-sm transition-transform hover:scale-105 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
 
-              <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#261740] to-[#150E22]">
+              <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#17254D] to-[#0C142B]">
                 <img
                   src={selectedMemory.image}
                   alt={selectedMemory.caption}
@@ -198,10 +196,10 @@ export default function PolaroidGallery() {
               </div>
 
               <div className="mt-4 px-2 text-center">
-                <p className="text-xs font-semibold tracking-[0.2em] text-[#C084FC] uppercase">
+                <p className="text-xs font-semibold tracking-[0.2em] text-[#9BB1E8] uppercase">
                   {selectedMemory.date}
                 </p>
-                <p className="mt-1.5 font-serif text-2xl leading-snug text-[#F6F1FC]">
+                <p className="mt-1.5 font-serif text-2xl leading-snug text-[#F4F7FC]">
                   {selectedMemory.caption}
                 </p>
               </div>

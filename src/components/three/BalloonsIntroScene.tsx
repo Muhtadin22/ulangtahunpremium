@@ -19,12 +19,12 @@ interface BalloonSpec {
 }
 
 const BALLOONS: BalloonSpec[] = [
-  { position: [-2.4, -0.35, -0.6], color: "#7E22CE", metalness: 0.35, scale: 0.92, speed: 1.1 },
-  { position: [-1.15, 0.85, -1.2], color: "#C084FC", metalness: 0.45, scale: 0.82, speed: 1.25 },
-  { position: [1.3, 0.75, -0.9], color: "#4C1D95", metalness: 0.4, scale: 0.88, speed: 1.18 },
-  { position: [2.45, -0.35, -0.5], color: "#A855F7", metalness: 0.35, scale: 0.96, speed: 1.05 },
-  { position: [-0.25, -1.35, -1.4], color: "#2E1065", metalness: 0.5, scale: 0.78, speed: 1.3 },
-  { position: [0.65, -1.55, -1.6], color: "#D8B4FE", metalness: 0.4, scale: 0.74, speed: 1.2 },
+  { position: [-2.4, -0.35, -0.6], color: "#1E3A8A", metalness: 0.42, scale: 0.92, speed: 1.1 },
+  { position: [-1.15, 0.85, -1.2], color: "#9BB1E8", metalness: 0.5, scale: 0.82, speed: 1.25 },
+  { position: [1.3, 0.75, -0.9], color: "#0F172A", metalness: 0.45, scale: 0.88, speed: 1.18 },
+  { position: [2.45, -0.35, -0.5], color: "#4F75D1", metalness: 0.4, scale: 0.96, speed: 1.05 },
+  { position: [-0.25, -1.35, -1.4], color: "#172554", metalness: 0.52, scale: 0.78, speed: 1.3 },
+  { position: [0.65, -1.55, -1.6], color: "#CBD5E1", metalness: 0.48, scale: 0.74, speed: 1.2 },
 ];
 
 function GlossyBalloon({
@@ -69,12 +69,11 @@ function GlossyBalloon({
         document.body.style.cursor = "auto";
       }}
     >
-      {/* Badan Balon Satin Metalik */}
       <mesh scale={[1, 1.18, 1]}>
         <sphereGeometry args={[0.72, 40, 40]} />
         <meshPhysicalMaterial
           color={color}
-          roughness={0.16}
+          roughness={0.14}
           metalness={metalness}
           clearcoat={1}
           clearcoatRoughness={0.08}
@@ -82,22 +81,21 @@ function GlossyBalloon({
         />
       </mesh>
 
-      {/* Simpul Bawah */}
       <mesh position={[0, -0.86, 0]} rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[0.1, 0.15, 16]} />
-        <meshPhysicalMaterial color={color} roughness={0.22} metalness={metalness} clearcoat={0.8} />
+        <meshPhysicalMaterial color={color} roughness={0.2} metalness={metalness} clearcoat={0.8} />
       </mesh>
 
-      {/* Tali Lilac Metalik Tipis */}
+      {/* Tali Platinum Silver Tipis */}
       <mesh position={[0, -1.6, 0]}>
         <cylinderGeometry args={[0.007, 0.007, 1.45, 8]} />
-        <meshStandardMaterial color="#D8B4FE" metalness={0.7} roughness={0.25} opacity={0.55} transparent />
+        <meshStandardMaterial color="#CBD5E1" metalness={0.8} roughness={0.2} opacity={0.6} transparent />
       </mesh>
     </group>
   );
 }
 
-function AmethystGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onTap: () => void }) {
+function StarlightGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onTap: () => void }) {
   const heartRef = useRef<THREE.Mesh>(null);
 
   const heartGeometry = useMemo(() => {
@@ -151,13 +149,13 @@ function AmethystGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onTa
         }}
       >
         <meshPhysicalMaterial
-          color="#C084FC"
-          emissive="#4C1D95"
+          color="#9BB1E8"
+          emissive="#1E3A8A"
           emissiveIntensity={0.35}
-          transmission={0.72}
+          transmission={0.75}
           opacity={1}
           transparent
-          roughness={0.06}
+          roughness={0.05}
           ior={1.48}
           thickness={0.9}
           clearcoat={1}
@@ -179,20 +177,20 @@ export default function BalloonsIntroScene({
       gl={{ antialias: true, alpha: true }}
       className="h-full w-full"
     >
-      <ambientLight intensity={0.65} color="#2E1065" />
-      <directionalLight position={[4, 6, 5]} intensity={2.2} color="#E9D5FF" />
-      <directionalLight position={[-5, 2, 4]} intensity={1.5} color="#9333EA" />
-      <pointLight position={[0, -2, 3]} intensity={1.4} color="#C084FC" />
+      <ambientLight intensity={0.75} color="#172554" />
+      <directionalLight position={[4, 6, 5]} intensity={2.2} color="#E2E8F0" />
+      <directionalLight position={[-5, 2, 4]} intensity={1.5} color="#4F75D1" />
+      <pointLight position={[0, -2, 3]} intensity={1.4} color="#9BB1E8" />
 
-      <Environment preset="night" environmentIntensity={0.6} />
+      <Environment preset="night" environmentIntensity={0.65} />
 
       <Sparkles
-        count={55}
+        count={65}
         scale={[8.5, 6.5, 4]}
         size={2.8}
         speed={0.35}
-        opacity={0.85}
-        color="#D8B4FE"
+        opacity={0.9}
+        color="#E2E8F0"
       />
 
       {BALLOONS.map((balloon, idx) => (
@@ -204,7 +202,7 @@ export default function BalloonsIntroScene({
         />
       ))}
 
-      <AmethystGlassHeart isLaunching={isLaunching} onTap={onBalloonTap} />
+      <StarlightGlassHeart isLaunching={isLaunching} onTap={onBalloonTap} />
     </Canvas>
   );
 }

@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-obsidian: #09060E;
-  --color-velvet-dark: #120C1D;
-  --color-royal-purple: #9333EA;
-  --color-orchid: #C084FC;
-  --color-moonlight: #F6F1FC;
+  --color-abyssal: #050811;
+  --color-celestial-navy: #0F172E;
+  --color-starlight-blue: #7AA2F7;
+  --color-periwinkle: #9BB1E8;
+  --color-starlight-white: #F4F7FC;
+  --color-mist-blue: #A3B4D4;
 
   --font-serif: var(--font-cormorant), Georgia, serif;
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
@@ -16,25 +17,25 @@
 }
 
 body {
-  background-color: #09060E;
-  color: #F6F1FC;
+  background-color: #050811;
+  color: #F4F7FC;
   font-family: var(--font-jakarta), system-ui, sans-serif;
 }
 
-/* Luxury Obsidian & Amethyst Glassmorphism */
-.glass-velvet {
+/* Celestial Midnight Navy & Silver Starlight Glassmorphism */
+.glass-celestial {
   background: linear-gradient(
     145deg,
-    rgba(28, 19, 44, 0.72) 0%,
-    rgba(15, 10, 24, 0.82) 100%
+    rgba(17, 27, 56, 0.74) 0%,
+    rgba(7, 11, 24, 0.85) 100%
   );
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(192, 132, 252, 0.22);
+  border: 1px solid rgba(155, 177, 232, 0.24);
   box-shadow:
-    0 20px 50px -12px rgba(0, 0, 0, 0.75),
-    0 0 28px -6px rgba(147, 51, 234, 0.22),
-    inset 0 1px 0 0 rgba(233, 213, 255, 0.14);
+    0 20px 50px -12px rgba(0, 0, 0, 0.78),
+    0 0 28px -6px rgba(122, 162, 247, 0.18),
+    inset 0 1px 0 0 rgba(226, 232, 240, 0.16);
 }
 
 /* 3D Card Flip Utilities */

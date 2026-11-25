@@ -13,12 +13,12 @@ interface FloatingHeartProps {
 }
 
 const HEART_ITEMS: FloatingHeartProps[] = [
-  { position: [-2.8, 0.8, -1.2], scale: 0.34, color: "#9333EA", speed: 1.1 },
-  { position: [-1.4, -0.9, -0.8], scale: 0.25, color: "#C084FC", speed: 1.4 },
-  { position: [1.5, 1.0, -1.0], scale: 0.3, color: "#7E22CE", speed: 1.2 },
-  { position: [2.7, -0.5, -1.4], scale: 0.36, color: "#D8B4FE", speed: 1.0 },
-  { position: [0.1, 1.4, -1.8], scale: 0.28, color: "#A855F7", speed: 1.3 },
-  { position: [-0.4, -1.3, -1.5], scale: 0.24, color: "#6B21A8", speed: 1.5 },
+  { position: [-2.8, 0.8, -1.2], scale: 0.34, color: "#4F75D1", speed: 1.1 },
+  { position: [-1.4, -0.9, -0.8], scale: 0.25, color: "#9BB1E8", speed: 1.4 },
+  { position: [1.5, 1.0, -1.0], scale: 0.3, color: "#2B4C9B", speed: 1.2 },
+  { position: [2.7, -0.5, -1.4], scale: 0.36, color: "#CBD5E1", speed: 1.0 },
+  { position: [0.1, 1.4, -1.8], scale: 0.28, color: "#7AA2F7", speed: 1.3 },
+  { position: [-0.4, -1.3, -1.5], scale: 0.24, color: "#1E3A8A", speed: 1.5 },
 ];
 
 function MiniHeart({
@@ -41,11 +41,11 @@ function MiniHeart({
         <meshPhysicalMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={0.25}
-          roughness={0.14}
-          metalness={0.3}
+          emissiveIntensity={0.22}
+          roughness={0.12}
+          metalness={0.35}
           clearcoat={1}
-          clearcoatRoughness={0.08}
+          clearcoatRoughness={0.06}
           transparent
           opacity={0.9}
         />
@@ -81,17 +81,17 @@ export default function ClosingParticlesScene() {
       gl={{ antialias: true, alpha: true }}
       className="h-full w-full"
     >
-      <ambientLight intensity={0.8} color="#2E1065" />
-      <directionalLight position={[3, 4, 4]} intensity={1.6} color="#E9D5FF" />
-      <directionalLight position={[-3, -2, 3]} intensity={1.2} color="#9333EA" />
+      <ambientLight intensity={0.85} color="#172554" />
+      <directionalLight position={[3, 4, 4]} intensity={1.6} color="#E2E8F0" />
+      <directionalLight position={[-3, -2, 3]} intensity={1.2} color="#4F75D1" />
 
       <Sparkles
-        count={75}
+        count={80}
         scale={[7.5, 4.5, 3]}
         size={2.8}
         speed={0.35}
-        opacity={0.85}
-        color="#C084FC"
+        opacity={0.88}
+        color="#E2E8F0"
       />
 
       {HEART_ITEMS.map((item, index) => (

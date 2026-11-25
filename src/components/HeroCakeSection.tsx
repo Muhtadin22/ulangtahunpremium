@@ -23,7 +23,7 @@ const BentoCakeScene = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-full w-full items-center justify-center">
-        <div className="h-36 w-36 animate-pulse rounded-full bg-[#9333EA]/25 blur-xl" />
+        <div className="h-36 w-36 animate-pulse rounded-full bg-[#4F75D1]/25 blur-xl" />
       </div>
     ),
   }
@@ -34,7 +34,6 @@ const BLOW_GRACE_WINDOW_MS = 280;
 const BLOW_GESTURE_THRESHOLD = 0.36;
 export const SNAPSHOT_STORAGE_KEY = "birthday_wish_polaroid_snapshot";
 
-// Helper menggambar sudut membulat aman di semua versi browser mobile/desktop
 function traceRoundedRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -56,7 +55,7 @@ function traceRoundedRect(
   ctx.closePath();
 }
 
-// Menangkap 1 frame kamera & menyusunnya ke template Polaroid Midnight Velvet
+// Polaroid Candid bernuansa Midnight Navy & Silver Starlight
 function generatePolaroidDataUrl(video: HTMLVideoElement): string | null {
   if (!video.videoWidth || !video.videoHeight) return null;
 
@@ -69,24 +68,24 @@ function generatePolaroidDataUrl(video: HTMLVideoElement): string | null {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // 1. Latar Polaroid Hitam-Ungu Velvet
+  // 1. Latar Polaroid Midnight Navy
   const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-  bgGrad.addColorStop(0, "#1D1230");
-  bgGrad.addColorStop(0.55, "#110A1E");
-  bgGrad.addColorStop(1, "#09060E");
+  bgGrad.addColorStop(0, "#131F42");
+  bgGrad.addColorStop(0.55, "#0A1126");
+  bgGrad.addColorStop(1, "#050811");
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, W, H);
 
-  // 2. Bingkai garis halus Amethyst di sekeliling Polaroid
-  ctx.strokeStyle = "rgba(192, 132, 252, 0.32)";
+  // 2. Bingkai garis tipis Silver Starlight
+  ctx.strokeStyle = "rgba(155, 177, 232, 0.36)";
   ctx.lineWidth = 3;
   traceRoundedRect(ctx, 14, 14, W - 28, H - 28, 28);
   ctx.stroke();
 
-  // 3. Area Foto Candid (1:1 Center-Crop + Mirror sesuai tampilan kamera depan)
+  // 3. Area Foto Candid (1:1 Center-Crop + Mirror)
   const photoX = 48;
   const photoY = 54;
-  const photoSize = W - 96; // 624x624
+  const photoSize = W - 96;
 
   ctx.save();
   traceRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 22);
@@ -96,13 +95,12 @@ function generatePolaroidDataUrl(video: HTMLVideoElement): string | null {
   const sx = (video.videoWidth - srcMin) / 2;
   const sy = (video.videoHeight - srcMin) / 2;
 
-  // Mirror horizontal agar sama seperti pantulan cermin
   ctx.translate(photoX + photoSize, photoY);
   ctx.scale(-1, 1);
   ctx.drawImage(video, sx, sy, srcMin, srcMin, 0, 0, photoSize, photoSize);
   ctx.restore();
 
-  // Vignette ungu lembut di tepi foto
+  // Vignette biru malam lembut di tepi foto
   ctx.save();
   traceRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 22);
   ctx.clip();
@@ -114,28 +112,25 @@ function generatePolaroidDataUrl(video: HTMLVideoElement): string | null {
     photoY + photoSize / 2,
     photoSize * 0.68
   );
-  vig.addColorStop(0, "rgba(9, 6, 14, 0)");
-  vig.addColorStop(1, "rgba(18, 10, 32, 0.38)");
+  vig.addColorStop(0, "rgba(5, 8, 17, 0)");
+  vig.addColorStop(1, "rgba(10, 17, 38, 0.38)");
   ctx.fillStyle = vig;
   ctx.fillRect(photoX, photoY, photoSize, photoSize);
   ctx.restore();
 
-  // Garis tepi frame foto
-  ctx.strokeStyle = "rgba(216, 180, 254, 0.35)";
+  ctx.strokeStyle = "rgba(226, 232, 240, 0.35)";
   ctx.lineWidth = 2;
   traceRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 22);
   ctx.stroke();
 
-  // 4. Tipografi Polaroid di Bawah Foto
+  // 4. Tipografi Polaroid
   ctx.textAlign = "center";
 
-  // Label kecil atas
-  ctx.fillStyle = "#C084FC";
+  ctx.fillStyle = "#9BB1E8";
   ctx.font = '600 17px "Plus Jakarta Sans", system-ui, sans-serif';
-  ctx.fillText("✦  BIRTHDAY WISH POLAROID  ✦", W / 2, 738);
+  ctx.fillText("✦  STARLIGHT WISH POLAROID  ✦", W / 2, 738);
 
-  // Judul utama: Make a Wish — 25 Nov 2026
-  ctx.fillStyle = "#F6F1FC";
+  ctx.fillStyle = "#F4F7FC";
   ctx.font = 'italic 600 44px "Cormorant Garamond", Georgia, serif';
   ctx.fillText(
     `Make a Wish — ${birthdayData.snapshotDateLabel}`,
@@ -143,11 +138,10 @@ function generatePolaroidDataUrl(video: HTMLVideoElement): string | null {
     794
   );
 
-  // Subtitle nama & usia
-  ctx.fillStyle = "rgba(216, 180, 254, 0.78)";
+  ctx.fillStyle = "rgba(163, 180, 212, 0.85)";
   ctx.font = '500 20px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.fillText(
-    `Happy ${birthdayData.age}nd Birthday, ${birthdayData.partnerName} 💜`,
+    `Happy ${birthdayData.age}nd Birthday, ${birthdayData.partnerName} 🤍`,
     W / 2,
     842
   );
@@ -178,7 +172,6 @@ export default function HeroCakeSection() {
   const lastTimestampRef = useRef<number>(0);
   const hasTriggeredRef = useRef(false);
 
-  // Redam log INFO internal TensorFlow Lite XNNPACK
   useEffect(() => {
     const originalConsoleError = console.error;
     console.error = (...args: unknown[]) => {
@@ -269,7 +262,6 @@ export default function HeroCakeSection() {
     if (hasTriggeredRef.current) return;
     hasTriggeredRef.current = true;
 
-    // Tangkap Candid Snapshot Polaroid tepat saat api lilin padam sebelum kamera dimatikan
     if (videoRef.current && videoRef.current.readyState >= 2) {
       const polaroidDataUrl = generatePolaroidDataUrl(videoRef.current);
       if (polaroidDataUrl) {
@@ -278,7 +270,7 @@ export default function HeroCakeSection() {
         try {
           sessionStorage.setItem(SNAPSHOT_STORAGE_KEY, polaroidDataUrl);
         } catch {
-          // Abaikan jika browser membatasi storage
+          // Abaikan jika storage terbatas
         }
       }
     }
@@ -292,7 +284,7 @@ export default function HeroCakeSection() {
       particleCount: 85,
       spread: 85,
       origin: { y: 0.55 },
-      colors: ["#9333EA", "#C084FC", "#E9D5FF", "#F5D0FE", "#FBBF24"],
+      colors: ["#7AA2F7", "#9BB1E8", "#E2E8F0", "#3B66C4", "#FDE68A"],
       scalar: 0.9,
     });
 
@@ -456,7 +448,7 @@ export default function HeroCakeSection() {
 
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 pt-12 pb-16">
-      {/* Efek Flash Kamera Lembut Saat Candid Snapshot Diambil */}
+      {/* Efek Flash Starlight Saat Candid Snapshot Diambil */}
       <AnimatePresence>
         {showShutterFlash && (
           <motion.div
@@ -464,12 +456,12 @@ export default function HeroCakeSection() {
             animate={{ opacity: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.32 }}
-            className="pointer-events-none fixed inset-0 z-50 bg-[#F3E8FF]"
+            className="pointer-events-none fixed inset-0 z-50 bg-[#E2E8F0]"
           />
         )}
       </AnimatePresence>
 
-      <div className="pointer-events-none absolute top-1/3 left-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#7E22CE]/20 blur-[120px]" />
+      <div className="pointer-events-none absolute top-1/3 left-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2B4C9B]/22 blur-[120px]" />
 
       {/* Header Ucapan */}
       <motion.div
@@ -478,27 +470,27 @@ export default function HeroCakeSection() {
         transition={{ duration: 0.85, ease: DREAMY_EASE }}
         className="relative z-10 mx-auto max-w-2xl text-center"
       >
-        <p className="text-xs font-semibold tracking-[0.28em] text-[#C084FC] uppercase">
+        <p className="text-xs font-semibold tracking-[0.28em] text-[#9BB1E8] uppercase">
           {birthdayData.hero.eyebrow} • {birthdayData.birthdayDate}
         </p>
 
-        <h1 className="mt-2.5 font-serif text-4xl font-semibold tracking-tight text-[#F6F1FC] sm:text-6xl">
+        <h1 className="mt-2.5 font-serif text-4xl font-semibold tracking-tight text-[#F4F7FC] sm:text-6xl">
           Happy {birthdayData.age}
-          <span className="align-super text-xl font-normal italic text-[#C084FC] sm:text-2xl">
+          <span className="align-super text-xl font-normal italic text-[#9BB1E8] sm:text-2xl">
             nd
           </span>{" "}
           Birthday,{" "}
-          <span className="bg-gradient-to-r from-[#D8B4FE] via-[#C084FC] to-[#A855F7] bg-clip-text italic text-transparent">
+          <span className="bg-gradient-to-r from-[#E2E8F0] via-[#9BB1E8] to-[#7AA2F7] bg-clip-text italic text-transparent">
             {birthdayData.partnerName}
           </span>
         </h1>
 
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-[#D8B4FE]/75 sm:text-base">
+        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-[#A3B4D4] sm:text-base">
           {birthdayData.hero.subtitle}
         </p>
       </motion.div>
 
-      {/* Panggung Utama: Kue 3D + Cermin Kamera Gestur Fisik */}
+      {/* Panggung Utama: Kue 3D + Cermin Kamera Starlight */}
       <div className="relative z-10 mt-3 flex w-full max-w-4xl flex-col items-center justify-center gap-6 md:flex-row">
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}
@@ -508,8 +500,8 @@ export default function HeroCakeSection() {
         >
           <BentoCakeScene isBlownOut={isBlownOut} blowIntensity={flameBend} />
 
-          <div className="pointer-events-none absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-[#C084FC]/20 bg-[#140E21]/80 px-3.5 py-1 text-xs text-[#D8B4FE]/80 backdrop-blur-md">
-            <RotateCw className="h-3 w-3 text-[#C084FC]" />
+          <div className="pointer-events-none absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-[#9BB1E8]/20 bg-[#0A1022]/80 px-3.5 py-1 text-xs text-[#A3B4D4] backdrop-blur-md">
+            <RotateCw className="h-3 w-3 text-[#9BB1E8]" />
             <span>Geser untuk memutar kue 3D</span>
           </div>
         </motion.div>
@@ -521,7 +513,7 @@ export default function HeroCakeSection() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.88, y: 10 }}
               transition={{ duration: 0.45, ease: DREAMY_EASE }}
-              className="glass-velvet flex flex-col items-center rounded-3xl p-4 text-center"
+              className="glass-celestial flex flex-col items-center rounded-3xl p-4 text-center"
             >
               <div className="relative flex h-56 w-56 items-center justify-center">
                 <svg
@@ -533,7 +525,7 @@ export default function HeroCakeSection() {
                     cy="112"
                     r={ringRadius}
                     fill="none"
-                    stroke="rgba(192, 132, 252, 0.18)"
+                    stroke="rgba(155, 177, 232, 0.18)"
                     strokeWidth="5"
                   />
                   <circle
@@ -541,7 +533,7 @@ export default function HeroCakeSection() {
                     cy="112"
                     r={ringRadius}
                     fill="none"
-                    stroke="#C084FC"
+                    stroke="#7AA2F7"
                     strokeWidth="5"
                     strokeLinecap="round"
                     strokeDasharray={ringCircumference}
@@ -553,10 +545,10 @@ export default function HeroCakeSection() {
                 <div
                   className={`relative h-48 w-48 overflow-hidden rounded-full border transition-colors duration-200 ${
                     isActivelyBlowing
-                      ? "border-[#E9D5FF] shadow-[0_0_34px_rgba(192,132,252,0.75)]"
+                      ? "border-[#E2E8F0] shadow-[0_0_34px_rgba(122,162,247,0.75)]"
                       : isFaceDetected
-                      ? "border-[#C084FC]/70 shadow-[0_0_24px_rgba(147,51,234,0.45)]"
-                      : "border-[#C084FC]/30"
+                      ? "border-[#9BB1E8]/75 shadow-[0_0_24px_rgba(79,117,209,0.45)]"
+                      : "border-[#9BB1E8]/30"
                   }`}
                 >
                   <video
@@ -566,35 +558,35 @@ export default function HeroCakeSection() {
                     muted
                     className="h-full w-full -scale-x-100 object-cover"
                   />
-                  <div className="pointer-events-none absolute inset-0 rounded-full ring-inset ring-6 ring-[#09060E]/30" />
+                  <div className="pointer-events-none absolute inset-0 rounded-full ring-inset ring-6 ring-[#050811]/35" />
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#E9D5FF]">
+              <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#F4F7FC]">
                 {!isSensorReady ? (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-[#C084FC]" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-[#9BB1E8]" />
                     <span>Mengaktifkan sensor wajah...</span>
                   </>
                 ) : isActivelyBlowing ? (
                   <>
-                    <Wind className="h-3.5 w-3.5 animate-bounce text-[#C084FC]" />
+                    <Wind className="h-3.5 w-3.5 animate-bounce text-[#7AA2F7]" />
                     <span>Tahan tiupan... {Math.round(holdProgress * 100)}%</span>
                   </>
                 ) : isFaceDetected ? (
                   <>
-                    <Wind className="h-3.5 w-3.5 text-[#C084FC]" />
+                    <Wind className="h-3.5 w-3.5 text-[#9BB1E8]" />
                     <span>Siap! Peragakan tiupan ke layar</span>
                   </>
                 ) : (
                   <>
-                    <ScanFace className="h-3.5 w-3.5 text-[#D8B4FE]/70" />
+                    <ScanFace className="h-3.5 w-3.5 text-[#A3B4D4]" />
                     <span>Arahkan wajah ke lingkaran kamera</span>
                   </>
                 )}
               </div>
 
-              <p className="mt-1.5 max-w-[225px] text-[11px] leading-relaxed text-[#D8B4FE]/75">
+              <p className="mt-1.5 max-w-[225px] text-[11px] leading-relaxed text-[#A3B4D4]">
                 Kerucutkan bibir seperti meniup lilin dan tahan 1,5 detik. Momen candid-mu akan otomatis diabadikan!
               </p>
             </motion.div>
@@ -615,7 +607,7 @@ export default function HeroCakeSection() {
               <button
                 onClick={handleEnableCamera}
                 disabled={isOpeningCamera}
-                className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[#7E22CE] via-[#9333EA] to-[#A855F7] px-8 py-3.5 text-sm font-semibold text-white shadow-[0_10px_30px_-6px_rgba(147,51,234,0.65)] ring-1 ring-[#E9D5FF]/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-4px_rgba(168,85,247,0.8)] active:scale-95 disabled:opacity-70 cursor-pointer"
+                className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[#2B4C9B] via-[#4F75D1] to-[#7AA2F7] px-8 py-3.5 text-sm font-semibold text-white shadow-[0_10px_30px_-6px_rgba(79,117,209,0.65)] ring-1 ring-[#E2E8F0]/35 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-4px_rgba(122,162,247,0.8)] active:scale-95 disabled:opacity-70 cursor-pointer"
               >
                 {isOpeningCamera ? (
                   <>
@@ -632,15 +624,15 @@ export default function HeroCakeSection() {
             )}
 
             {cameraError && (
-              <p className="mt-3 flex items-center gap-1.5 text-xs text-[#F5D0FE]/85">
-                <CameraOff className="h-3.5 w-3.5 text-[#C084FC]" />
+              <p className="mt-3 flex items-center gap-1.5 text-xs text-[#CBD5E1]">
+                <CameraOff className="h-3.5 w-3.5 text-[#9BB1E8]" />
                 <span>{cameraError}</span>
               </p>
             )}
 
             <button
               onClick={completeCandleBlow}
-              className="mt-3.5 text-xs font-medium text-[#D8B4FE]/65 underline decoration-[#C084FC]/40 underline-offset-4 transition-colors hover:text-[#F6F1FC] cursor-pointer"
+              className="mt-3.5 text-xs font-medium text-[#A3B4D4] underline decoration-[#9BB1E8]/40 underline-offset-4 transition-colors hover:text-[#F4F7FC] cursor-pointer"
             >
               {birthdayData.hero.manualFallbackLabel}
             </button>
@@ -653,13 +645,13 @@ export default function HeroCakeSection() {
               initial={{ opacity: 0, y: 18, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.65, ease: DREAMY_EASE }}
-              className="glass-velvet mt-4 max-w-md rounded-3xl px-7 py-6 text-center"
+              className="glass-celestial mt-4 max-w-md rounded-3xl px-7 py-6 text-center"
             >
-              <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#C084FC]">
+              <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#9BB1E8]">
                 <Sparkles className="h-4 w-4 animate-spin" />
                 <span>{birthdayData.hero.wishMessageTitle}</span>
               </div>
-              <p className="mt-2 font-serif text-xl leading-relaxed text-[#F6F1FC]">
+              <p className="mt-2 font-serif text-xl leading-relaxed text-[#F4F7FC]">
                 {birthdayData.hero.wishMessageBody}
               </p>
             </motion.div>
