@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
@@ -10,10 +10,178 @@ import {
   OrbitControls,
   Sparkles,
 } from "@react-three/drei";
+import { birthdayData } from "@/data/birthdayData";
 
 interface BentoCakeSceneProps {
   isBlownOut: boolean;
   blowIntensity?: number;
+  partnerName?: string;
+  topLabel?: string;
+}
+
+// Helper menggambar teks melengkung di atas permukaan kue
+function drawCurvedIcingText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  centerX: number,
+  centerY: number,
+  radius: number,
+  position: "top" | "bottom",
+  isBumpMap: boolean
+) {
+  const chars = Array.from(text);
+  if (chars.length === 0) return;
+
+  const charWidths = chars.map((ch) => ctx.measureText(ch).width);
+  const letterSpacing = position === "top" ? 8 : 5;
+  const totalArcLength =
+    charWidths.reduce((acc, w) => acc + w, 0) +
+    letterSpacing * Math.max(0, chars.length - 1);
+
+  const totalAngle = totalArcLength / radius;
+  let currentAngle =
+    position === "top"
+      ? -Math.PI / 2 - totalAngle / 2
+      : Math.PI / 2 + totalAngle / 2;
+
+  chars.forEach((ch, idx) => {
+    const halfCharAngle = charWidths[idx] / 2 / radius;
+    currentAngle += position === "top" ? halfCharAngle : -halfCharAngle;
+
+    const x = centerX + Math.cos(currentAngle) * radius;
+    const y = centerY + Math.sin(currentAngle) * radius;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(
+      position === "top"
+        ? currentAngle + Math.PI / 2
+        : currentAngle - Math.PI / 2
+    );
+
+    if (isBumpMap) {
+      // Bump map putih lembut untuk memberi ketebalan 3D pada krim tulisan
+      ctx.shadowColor = "rgba(255, 255, 255, 0.85)";
+      ctx.shadowBlur = 10;
+      ctx.lineWidth = position === "top" ? 10 : 14;
+      ctx.strokeStyle = "#D0D0D0";
+      ctx.strokeText(ch, 0, 0);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillText(ch, 0, 0);
+    } else {
+      // 1. Bayangan lembut di atas frosting kue
+      ctx.save();
+      ctx.shadowColor = "rgba(10, 17, 38, 0.35)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 5;
+      ctx.lineWidth = position === "top" ? 11 : 15;
+      ctx.strokeStyle = "#F8FAFC";
+      ctx.strokeText(ch, 0, 0);
+      ctx.restore();
+
+      // 2. Outline krim Starlight Periwinkle
+      ctx.lineWidth = position === "top" ? 8 : 11;
+      ctx.strokeStyle = position === "top" ? "#7AA2F7" : "#9BB1E8";
+      ctx.strokeText(ch, 0, 0);
+
+      // 3. Isi utama krim Midnight Navy
+      ctx.fillStyle = position === "top" ? "#1E3A8A" : "#111D42";
+      ctx.fillText(ch, 0, 0);
+
+      // 4. Kilau piping halus di tengah huruf
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(244, 247, 252, 0.55)";
+      ctx.strokeText(ch, 0, -1.5);
+    }
+
+    ctx.restore();
+
+    const stepAfter =
+      (charWidths[idx] / 2 + letterSpacing) / radius;
+    currentAngle += position === "top" ? stepAfter : -stepAfter;
+  });
+}
+
+// Membuat tekstur warna & bump map timbul untuk tulisan nama di atas kue
+function createCakeWritingTextures(partnerName: string, topLabel: string) {
+  const size = 1024;
+  const cx = size / 2;
+  const cy = size / 2;
+
+  const colorCanvas = document.createElement("canvas");
+  colorCanvas.width = size;
+  colorCanvas.height = size;
+  const colorCtx = colorCanvas.getContext("2d");
+
+  const bumpCanvas = document.createElement("canvas");
+  bumpCanvas.width = size;
+  bumpCanvas.height = size;
+  const bumpCtx = bumpCanvas.getContext("2d");
+
+  if (colorCtx && bumpCtx) {
+    // Latar bump map hitam datar
+    bumpCtx.fillStyle = "#000000";
+    bumpCtx.fillRect(0, 0, size, size);
+
+    [colorCtx, bumpCtx].forEach((ctx, index) => {
+      const isBump = index === 1;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+
+      // 1. Lengkungan Atas: Ucapan Singkat (misal: "HBD 22")
+      const cleanTop = topLabel.trim().toUpperCase();
+      if (cleanTop) {
+        ctx.font = '700 44px "Plus Jakarta Sans", system-ui, sans-serif';
+        drawCurvedIcingText(ctx, cleanTop, cx, cy, 245, "top", isBump);
+      }
+
+      // 2. Lengkungan Bawah (Depan Lilin): Nama yang Berulang Tahun
+      const displayName = partnerName.trim() || "Sayang";
+      const nameFontSize =
+        displayName.length <= 6
+          ? 104
+          : displayName.length <= 10
+          ? 86
+          : displayName.length <= 14
+          ? 70
+          : 58;
+
+      ctx.font = `italic 700 ${nameFontSize}px "Cormorant Garamond", Georgia, serif`;
+      drawCurvedIcingText(ctx, displayName, cx, cy, 268, "bottom", isBump);
+
+      // 3. Dekorasi Bintang & Hati Krim di Sisi Kiri-Kanan Kue
+      ctx.font = '600 34px system-ui, sans-serif';
+      const doodles = [
+        { symbol: "✦", x: cx - 275, y: cy - 10 },
+        { symbol: "✦", x: cx + 275, y: cy - 10 },
+        { symbol: "♡", x: cx - 225, y: cy + 125 },
+        { symbol: "♡", x: cx + 225, y: cy + 125 },
+      ];
+
+      doodles.forEach((d) => {
+        if (isBump) {
+          ctx.fillStyle = "#E5E5E5";
+          ctx.fillText(d.symbol, d.x, d.y);
+        } else {
+          ctx.fillStyle = "#4F75D1";
+          ctx.fillText(d.symbol, d.x, d.y);
+        }
+      });
+    });
+  }
+
+  const colorTexture = new THREE.CanvasTexture(colorCanvas);
+  colorTexture.colorSpace = THREE.SRGBColorSpace;
+  colorTexture.anisotropy = 8;
+  colorTexture.needsUpdate = true;
+
+  const bumpTexture = new THREE.CanvasTexture(bumpCanvas);
+  bumpTexture.anisotropy = 8;
+  bumpTexture.needsUpdate = true;
+
+  return { colorTexture, bumpTexture };
 }
 
 function SpiralCandle({
@@ -171,11 +339,27 @@ function SpiralCandle({
 function MidnightStarlightCake({
   isBlownOut,
   blowIntensity = 0,
+  partnerName,
+  topLabel,
 }: {
   isBlownOut: boolean;
   blowIntensity?: number;
+  partnerName: string;
+  topLabel: string;
 }) {
   const cakeGroupRef = useRef<THREE.Group>(null);
+
+  const { colorTexture, bumpTexture } = useMemo(
+    () => createCakeWritingTextures(partnerName, topLabel),
+    [partnerName, topLabel]
+  );
+
+  useEffect(() => {
+    return () => {
+      colorTexture.dispose();
+      bumpTexture.dispose();
+    };
+  }, [colorTexture, bumpTexture]);
 
   const topPiping = useMemo(() => {
     const count = 16;
@@ -202,11 +386,12 @@ function MidnightStarlightCake({
     });
   }, []);
 
+  // Mutiara gula ditempatkan di tepi luar (radius 0.87) agar memberi ruang luas untuk tulisan nama
   const starlightPearls = useMemo(() => {
-    const count = 10;
-    const radius = 0.68;
+    const count = 12;
+    const radius = 0.87;
     return Array.from({ length: count }, (_, i) => {
-      const angle = (i / count) * Math.PI * 2 + 0.3;
+      const angle = (i / count) * Math.PI * 2 + 0.25;
       return {
         x: Math.cos(angle) * radius,
         z: Math.sin(angle) * radius,
@@ -259,6 +444,22 @@ function MidnightStarlightCake({
           <meshStandardMaterial color="#DCE6FA" roughness={0.42} />
         </mesh>
 
+        {/* Lapisan Tulisan Krim Timbul (Nama yang Berulang Tahun & Ucapan) */}
+        <mesh position={[0, 0.642, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.98, 64]} />
+          <meshPhysicalMaterial
+            map={colorTexture}
+            bumpMap={bumpTexture}
+            bumpScale={0.018}
+            transparent
+            alphaTest={0.02}
+            roughness={0.28}
+            clearcoat={0.75}
+            clearcoatRoughness={0.15}
+            depthWrite={false}
+          />
+        </mesh>
+
         {/* Tepi Bulat Halus di Atas Kue */}
         <mesh position={[0, 0.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[1.18, 0.06, 16, 56]} />
@@ -290,7 +491,7 @@ function MidnightStarlightCake({
         {/* Mutiara Kristal Silver & Starlight di Atas Kue */}
         {starlightPearls.map((pearl, idx) => (
           <mesh key={idx} position={[pearl.x, 0.65, pearl.z]}>
-            <sphereGeometry args={[0.048, 16, 16]} />
+            <sphereGeometry args={[0.044, 16, 16]} />
             <meshPhysicalMaterial
               color={pearl.color}
               roughness={0.08}
@@ -326,12 +527,14 @@ function MidnightStarlightCake({
 export default function BentoCakeScene({
   isBlownOut,
   blowIntensity = 0,
+  partnerName = birthdayData.partnerName,
+  topLabel = birthdayData.hero.cakeTopText,
 }: BentoCakeSceneProps) {
   return (
     <Canvas
       dpr={[1, 2]}
       shadows
-      camera={{ position: [0, 2.2, 4.9], fov: 38 }}
+      camera={{ position: [0, 2.55, 4.75], fov: 38 }}
       gl={{ antialias: true, alpha: true }}
       className="h-full w-full touch-pan-y"
     >
@@ -350,9 +553,10 @@ export default function BentoCakeScene({
       <MidnightStarlightCake
         isBlownOut={isBlownOut}
         blowIntensity={blowIntensity}
+        partnerName={partnerName}
+        topLabel={topLabel}
       />
 
-      {/* Partikel Bintang Perak & Starlight */}
       <Sparkles
         count={isBlownOut ? 90 : 32}
         scale={isBlownOut ? [4.8, 3.6, 4.8] : [3.2, 2.2, 3.2]}
@@ -377,7 +581,7 @@ export default function BentoCakeScene({
         enableDamping
         dampingFactor={0.06}
         rotateSpeed={0.65}
-        minPolarAngle={Math.PI / 4}
+        minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 2.15}
       />
     </Canvas>
