@@ -16,35 +16,47 @@
   --ease-dreamy: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+html,
 body {
   background-color: #050811;
   color: #F4F7FC;
   font-family: var(--font-jakarta), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Celestial Midnight Navy & Silver Starlight Glassmorphism */
 .glass-celestial {
   background: linear-gradient(
     145deg,
-    rgba(17, 27, 56, 0.74) 0%,
-    rgba(7, 11, 24, 0.85) 100%
+    rgba(17, 27, 56, 0.78) 0%,
+    rgba(7, 11, 24, 0.88) 100%
   );
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(155, 177, 232, 0.24);
   box-shadow:
-    0 20px 50px -12px rgba(0, 0, 0, 0.78),
-    0 0 28px -6px rgba(122, 162, 247, 0.18),
+    0 18px 42px -12px rgba(0, 0, 0, 0.78),
+    0 0 24px -6px rgba(122, 162, 247, 0.16),
     inset 0 1px 0 0 rgba(226, 232, 240, 0.16);
 }
 
-/* 3D Card Flip Utilities */
+@media (min-width: 768px) {
+  .glass-celestial {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+}
+
+/* 3D Transform Utilities — Stabil di Safari iOS & Chrome Android */
 .perspective-1000 {
   perspective: 1000px;
+  -webkit-perspective: 1000px;
 }
 
 .preserve-3d {
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .backface-hidden {
@@ -52,6 +64,12 @@ body {
   -webkit-backface-visibility: hidden;
 }
 
-.rotate-y-180 {
-  transform: rotateY(180deg);
+.card-face-front {
+  transform: rotateY(0deg) translateZ(1px);
+  -webkit-transform: rotateY(0deg) translateZ(1px);
+}
+
+.card-face-back {
+  transform: rotateY(180deg) translateZ(1px);
+  -webkit-transform: rotateY(180deg) translateZ(1px);
 }

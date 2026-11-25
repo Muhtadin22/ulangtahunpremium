@@ -2,7 +2,7 @@
 
 import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Sparkles } from "@react-three/drei";
 
 interface BalloonsIntroSceneProps {
@@ -20,11 +20,11 @@ interface BalloonSpec {
 
 const BALLOONS: BalloonSpec[] = [
   { position: [-2.4, -0.35, -0.6], color: "#1E3A8A", metalness: 0.42, scale: 0.92, speed: 1.1 },
-  { position: [-1.15, 0.85, -1.2], color: "#9BB1E8", metalness: 0.5, scale: 0.82, speed: 1.25 },
-  { position: [1.3, 0.75, -0.9], color: "#0F172A", metalness: 0.45, scale: 0.88, speed: 1.18 },
+  { position: [-1.15, 0.95, -1.2], color: "#9BB1E8", metalness: 0.5, scale: 0.82, speed: 1.25 },
+  { position: [1.3, 0.85, -0.9], color: "#0F172A", metalness: 0.45, scale: 0.88, speed: 1.18 },
   { position: [2.45, -0.35, -0.5], color: "#4F75D1", metalness: 0.4, scale: 0.96, speed: 1.05 },
-  { position: [-0.25, -1.35, -1.4], color: "#172554", metalness: 0.52, scale: 0.78, speed: 1.3 },
-  { position: [0.65, -1.55, -1.6], color: "#CBD5E1", metalness: 0.48, scale: 0.74, speed: 1.2 },
+  { position: [-0.45, -1.45, -1.4], color: "#172554", metalness: 0.52, scale: 0.78, speed: 1.3 },
+  { position: [0.65, -1.6, -1.6], color: "#CBD5E1", metalness: 0.48, scale: 0.74, speed: 1.2 },
 ];
 
 function GlossyBalloon({
@@ -70,7 +70,7 @@ function GlossyBalloon({
       }}
     >
       <mesh scale={[1, 1.18, 1]}>
-        <sphereGeometry args={[0.72, 40, 40]} />
+        <sphereGeometry args={[0.72, 32, 32]} />
         <meshPhysicalMaterial
           color={color}
           roughness={0.14}
@@ -86,7 +86,6 @@ function GlossyBalloon({
         <meshPhysicalMaterial color={color} roughness={0.2} metalness={metalness} clearcoat={0.8} />
       </mesh>
 
-      {/* Tali Platinum Silver Tipis */}
       <mesh position={[0, -1.6, 0]}>
         <cylinderGeometry args={[0.007, 0.007, 1.45, 8]} />
         <meshStandardMaterial color="#CBD5E1" metalness={0.8} roughness={0.2} opacity={0.6} transparent />
@@ -95,7 +94,15 @@ function GlossyBalloon({
   );
 }
 
-function StarlightGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onTap: () => void }) {
+function StarlightGlassHeart({
+  isLaunching,
+  onTap,
+  scale = 1,
+}: {
+  isLaunching: boolean;
+  onTap: () => void;
+  scale?: number;
+}) {
   const heartRef = useRef<THREE.Mesh>(null);
 
   const heartGeometry = useMemo(() => {
@@ -109,11 +116,11 @@ function StarlightGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onT
     const geom = new THREE.ExtrudeGeometry(shape, {
       depth: 0.28,
       bevelEnabled: true,
-      bevelSegments: 10,
+      bevelSegments: 8,
       steps: 2,
       bevelSize: 0.12,
       bevelThickness: 0.14,
-      curveSegments: 32,
+      curveSegments: 28,
     });
     geom.center();
     return geom;
@@ -124,9 +131,12 @@ function StarlightGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onT
     heartRef.current.rotation.y += delta * 0.55;
     if (isLaunching) {
       heartRef.current.position.y += delta * 5.2;
-      heartRef.current.scale.lerp(new THREE.Vector3(1.25, 1.25, 1.25), delta * 2);
+      heartRef.current.scale.lerp(
+        new THREE.Vector3(scale * 1.25, scale * 1.25, scale * 1.25),
+        delta * 2
+      );
     } else {
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2.2) * 0.04;
+      const pulse = scale * (1 + Math.sin(state.clock.elapsedTime * 2.2) * 0.04);
       heartRef.current.scale.set(pulse, pulse, pulse);
     }
   });
@@ -152,7 +162,7 @@ function StarlightGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onT
           color="#9BB1E8"
           emissive="#1E3A8A"
           emissiveIntensity={0.35}
-          transmission={0.75}
+          transmission={0.72}
           opacity={1}
           transparent
           roughness={0.05}
@@ -166,28 +176,22 @@ function StarlightGlassHeart({ isLaunching, onTap }: { isLaunching: boolean; onT
   );
 }
 
-export default function BalloonsIntroScene({
+// Menyesuaikan tata letak balon & skala secara otomatis berdasarkan lebar layar HP vs Desktop
+function ResponsiveBalloonsGroup({
   isLaunching,
   onBalloonTap,
 }: BalloonsIntroSceneProps) {
+  const { viewport } = useThree();
+  const isPortraitMobile = viewport.width < 4.8;
+  const xFactor = isPortraitMobile ? 0.52 : 1;
+  const scaleFactor = isPortraitMobile ? 0.72 : 1;
+
   return (
-    <Canvas
-      dpr={[1, 2]}
-      camera={{ position: [0, 0, 6.2], fov: 44 }}
-      gl={{ antialias: true, alpha: true }}
-      className="h-full w-full"
-    >
-      <ambientLight intensity={0.75} color="#172554" />
-      <directionalLight position={[4, 6, 5]} intensity={2.2} color="#E2E8F0" />
-      <directionalLight position={[-5, 2, 4]} intensity={1.5} color="#4F75D1" />
-      <pointLight position={[0, -2, 3]} intensity={1.4} color="#9BB1E8" />
-
-      <Environment preset="night" environmentIntensity={0.65} />
-
+    <>
       <Sparkles
-        count={65}
-        scale={[8.5, 6.5, 4]}
-        size={2.8}
+        count={isPortraitMobile ? 38 : 65}
+        scale={[viewport.width + 1.5, viewport.height + 1, 4]}
+        size={isPortraitMobile ? 2.4 : 2.8}
         speed={0.35}
         opacity={0.9}
         color="#E2E8F0"
@@ -197,12 +201,48 @@ export default function BalloonsIntroScene({
         <GlossyBalloon
           key={idx}
           {...balloon}
+          position={[
+            balloon.position[0] * xFactor,
+            balloon.position[1] * (isPortraitMobile ? 1.15 : 1),
+            balloon.position[2],
+          ]}
+          scale={balloon.scale * scaleFactor}
           isLaunching={isLaunching}
           onTap={onBalloonTap}
         />
       ))}
 
-      <StarlightGlassHeart isLaunching={isLaunching} onTap={onBalloonTap} />
+      <StarlightGlassHeart
+        isLaunching={isLaunching}
+        onTap={onBalloonTap}
+        scale={isPortraitMobile ? 0.8 : 1}
+      />
+    </>
+  );
+}
+
+export default function BalloonsIntroScene({
+  isLaunching,
+  onBalloonTap,
+}: BalloonsIntroSceneProps) {
+  return (
+    <Canvas
+      dpr={[1, 1.5]}
+      camera={{ position: [0, 0, 6.2], fov: 44 }}
+      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      className="h-full w-full"
+    >
+      <ambientLight intensity={0.75} color="#172554" />
+      <directionalLight position={[4, 6, 5]} intensity={2.2} color="#E2E8F0" />
+      <directionalLight position={[-5, 2, 4]} intensity={1.5} color="#4F75D1" />
+      <pointLight position={[0, -2, 3]} intensity={1.4} color="#9BB1E8" />
+
+      <Environment preset="night" environmentIntensity={0.65} />
+
+      <ResponsiveBalloonsGroup
+        isLaunching={isLaunching}
+        onBalloonTap={onBalloonTap}
+      />
     </Canvas>
   );
 }

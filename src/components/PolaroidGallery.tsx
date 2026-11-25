@@ -52,6 +52,8 @@ function PolaroidCard({
   });
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Abaikan drag sentuhan HP agar tidak bentrok dengan scroll vertikal
+    if (e.pointerType !== "mouse") return;
     const rect = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
@@ -66,10 +68,10 @@ function PolaroidCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: 26 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.8, ease: DREAMY_EASE }}
+      viewport={{ once: true, amount: 0.12 }}
+      transition={{ duration: 0.75, ease: DREAMY_EASE }}
       className="perspective-1000"
     >
       <motion.div
@@ -80,19 +82,17 @@ function PolaroidCard({
           transformStyle: "preserve-3d",
         }}
         whileHover={{ scale: 1.03, rotateZ: 0 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.45, ease: DREAMY_EASE }}
+        whileTap={{ scale: 0.96, rotateZ: 0 }}
+        transition={{ duration: 0.4, ease: DREAMY_EASE }}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         onClick={() => onSelect(memory)}
-        className="relative cursor-pointer rounded-3xl border border-[#9BB1E8]/25 bg-gradient-to-b from-[#111B38]/90 to-[#080D1C]/95 p-3.5 pb-6 shadow-[0_20px_45px_-14px_rgba(0,0,0,0.85),0_0_24px_-8px_rgba(122,162,247,0.22)] backdrop-blur-md"
+        className="relative cursor-pointer rounded-3xl border border-[#9BB1E8]/25 bg-gradient-to-b from-[#111B38]/95 to-[#080D1C] p-3.5 pb-6 shadow-[0_20px_45px_-14px_rgba(0,0,0,0.85),0_0_24px_-8px_rgba(122,162,247,0.22)]"
       >
-        {/* Selotip Washi Starlight Translucent */}
-        <div className="pointer-events-none absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 -rotate-2 rounded-sm border border-[#E2E8F0]/20 bg-[#4F75D1]/35 backdrop-blur-xs" />
+        <div className="pointer-events-none absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 -rotate-2 rounded-sm border border-[#E2E8F0]/20 bg-[#4F75D1]/40" />
 
         <StickerBadge type={memory.sticker} />
 
-        {/* Bingkai Foto */}
         <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-[#9BB1E8]/15 bg-gradient-to-br from-[#17254D] via-[#0C142B] to-[#1E3369]">
           {!imgError ? (
             <img
@@ -112,7 +112,6 @@ function PolaroidCard({
           )}
         </div>
 
-        {/* Caption Polaroid */}
         <div className="mt-4 px-1 text-center">
           <p className="text-[11px] font-semibold tracking-[0.2em] text-[#9BB1E8] uppercase">
             {memory.date}
@@ -136,7 +135,7 @@ export default function PolaroidGallery() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: true, amount: 0.15 }}
         transition={{ duration: 0.8, ease: DREAMY_EASE }}
         className="mx-auto max-w-xl text-center"
       >
@@ -169,7 +168,7 @@ export default function PolaroidGallery() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: DREAMY_EASE }}
             onClick={() => setSelectedMemory(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#03050B]/85 p-5 backdrop-blur-lg"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#03050B]/85 p-5 backdrop-blur-md"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -182,7 +181,7 @@ export default function PolaroidGallery() {
               <button
                 onClick={() => setSelectedMemory(null)}
                 aria-label="Tutup pratinjau"
-                className="absolute top-6 right-6 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#9BB1E8]/30 bg-[#0A1022]/85 text-[#F4F7FC] shadow-lg backdrop-blur-sm transition-transform hover:scale-105 cursor-pointer"
+                className="absolute top-6 right-6 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#9BB1E8]/30 bg-[#0A1022]/85 text-[#F4F7FC] shadow-lg transition-transform hover:scale-105 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>

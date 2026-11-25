@@ -6,7 +6,9 @@ import { Heart, MailOpen, Mic, Pause, Play } from "lucide-react";
 import { birthdayData, DREAMY_EASE } from "@/data/birthdayData";
 import { useBirthdayAudio } from "@/context/AudioContext";
 
-const WAVE_BAR_HEIGHTS = [32, 65, 45, 88, 55, 100, 70, 42, 92, 60, 78, 48, 84, 52, 68, 36];
+const WAVE_BAR_HEIGHTS = [
+  32, 65, 45, 88, 55, 100, 70, 42, 92, 60, 78, 48, 84, 52, 68, 36,
+];
 
 function formatDuration(sec: number): string {
   if (!Number.isFinite(sec) || sec < 0) return "0:00";
@@ -24,6 +26,7 @@ function SecretVoiceNotePlayer({ isEnvelopeOpen }: { isEnvelopeOpen: boolean }) 
   const [duration, setDuration] = useState(0);
   const [audioError, setAudioError] = useState(false);
 
+  // Jeda voice note & kembalikan volume BGM jika amplop ditutup
   useEffect(() => {
     if (!isEnvelopeOpen && voiceRef.current && !voiceRef.current.paused) {
       voiceRef.current.pause();
@@ -63,7 +66,8 @@ function SecretVoiceNotePlayer({ isEnvelopeOpen }: { isEnvelopeOpen: boolean }) 
     }
   };
 
-  const progressPct = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const progressPct =
+    duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
 
   return (
     <motion.div
@@ -76,7 +80,7 @@ function SecretVoiceNotePlayer({ isEnvelopeOpen }: { isEnvelopeOpen: boolean }) 
       }}
       className="mt-8 rounded-2xl border border-[#9BB1E8]/30 bg-[#080E1E]/85 p-4 sm:p-5"
     >
-      {/* Mendukung .mp4 sekaligus .mp3 di iOS & Android */}
+      {/* Mendukung .mp4 sekaligus .mp3 secara stabil di iOS & Android */}
       <video
         ref={voiceRef}
         src={birthdayData.loveLetter.voiceNote.audioPath}
@@ -184,7 +188,7 @@ export default function LoveLetterEnvelope() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: true, amount: 0.15 }}
         transition={{ duration: 0.8, ease: DREAMY_EASE }}
         className="text-center"
       >
@@ -197,34 +201,39 @@ export default function LoveLetterEnvelope() {
       </motion.div>
 
       <div className="mt-12 flex flex-col items-center">
-        {/* Amplop Satin Midnight Navy & Silver Seal */}
+        {/* Amplop Satin Midnight Navy & Silver Seal dengan Perspektif 3D Stabil di Mobile */}
         <motion.button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
-          whileHover={{ y: -4 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.45, ease: DREAMY_EASE }}
-          className="relative w-full max-w-md cursor-pointer focus:outline-none"
+          className="perspective-1000 relative w-full max-w-md cursor-pointer focus:outline-none sm:transition-transform sm:duration-300 sm:hover:-translate-y-1"
         >
-          <div className="relative mx-auto h-56 w-full overflow-hidden rounded-3xl border border-[#9BB1E8]/30 bg-gradient-to-br from-[#16244A] via-[#0D162E] to-[#1E3163] shadow-[0_24px_55px_-14px_rgba(0,0,0,0.85),0_0_30px_-8px_rgba(122,162,247,0.3)] sm:h-64">
+          <div className="perspective-1000 relative mx-auto h-56 w-full overflow-hidden rounded-3xl border border-[#9BB1E8]/30 bg-gradient-to-br from-[#16244A] via-[#0D162E] to-[#1E3163] shadow-[0_24px_55px_-14px_rgba(0,0,0,0.85),0_0_30px_-8px_rgba(122,162,247,0.3)] sm:h-64">
+            {/* Tutup Amplop 3D (Flap) */}
             <motion.div
               animate={{
                 rotateX: isOpen ? 180 : 0,
                 opacity: isOpen ? 0.55 : 1,
               }}
               transition={{ duration: 0.75, ease: DREAMY_EASE }}
-              style={{ transformOrigin: "top center" }}
-              className="absolute inset-x-0 top-0 z-20 h-32"
+              style={{
+                transformOrigin: "top center",
+                transformStyle: "preserve-3d",
+              }}
+              className="absolute inset-x-0 top-0 z-20 h-32 will-change-transform"
             >
               <div
                 className="h-full w-full"
                 style={{
                   clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                  background: "linear-gradient(180deg, #243B75 0%, #142247 100%)",
+                  background:
+                    "linear-gradient(180deg, #243B75 0%, #142247 100%)",
                 }}
               />
             </motion.div>
 
+            {/* Garis Lipatan Bawah Amplop */}
             <div
               className="absolute inset-0 z-10 opacity-45"
               style={{
@@ -237,7 +246,7 @@ export default function LoveLetterEnvelope() {
             <motion.div
               animate={{ scale: isOpen ? 0.85 : 1, y: isOpen ? 14 : 0 }}
               transition={{ duration: 0.6, ease: DREAMY_EASE }}
-              className="absolute top-1/2 left-1/2 z-30 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#E2E8F0]/45 bg-gradient-to-br from-[#4F75D1] to-[#1E3A8A] text-white shadow-[0_8px_24px_rgba(79,117,209,0.75)]"
+              className="absolute top-1/2 left-1/2 z-30 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#E2E8F0]/45 bg-gradient-to-br from-[#4F75D1] to-[#1E3A8A] text-white shadow-[0_8px_24px_rgba(79,117,209,0.75)] will-change-transform"
             >
               {isOpen ? (
                 <MailOpen className="h-6 w-6" />
@@ -254,15 +263,15 @@ export default function LoveLetterEnvelope() {
           </div>
         </motion.button>
 
-        {/* Kertas Surat */}
+        {/* Kertas Surat + Voice Note Rahasia */}
         <AnimatePresence>
           {isOpen && (
             <motion.article
-              initial={{ opacity: 0, y: -26, scale: 0.96 }}
+              initial={{ opacity: 0, y: -24, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.96 }}
+              exit={{ opacity: 0, y: -18, scale: 0.96 }}
               transition={{ duration: 0.75, ease: DREAMY_EASE }}
-              className="glass-celestial relative -mt-4 w-full max-w-2xl rounded-3xl px-7 py-9 sm:px-12 sm:py-12"
+              className="glass-celestial relative -mt-4 w-full max-w-2xl rounded-3xl px-7 py-9 will-change-transform sm:px-12 sm:py-12"
             >
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
