@@ -60,11 +60,11 @@ export const birthdayData = {
       "Momen tiup lilinmu sudah tersimpan di bawah bintang. Membuka halaman kenangan kita...",
   },
 
-  // === 5. GALERI SCRAPBOOK POLAROID ===
+  // === 5. GALERI SCRAPBOOK POLAROID (FORMAT .PNG) ===
   memories: [
     {
       id: "mem-1",
-      image: "/images/memory-1.jpg",
+      image: "/images/memory-1.png",
       caption: "Senyum favoritku yang selalu bikin hari biasa terasa istimewa.",
       date: "Momen Pertama",
       rotation: -3,
@@ -72,7 +72,7 @@ export const birthdayData = {
     },
     {
       id: "mem-2",
-      image: "/images/memory-2.jpg",
+      image: "/images/memory-2.png",
       caption: "Kopi malam, obrolan panjang, dan tawa yang tidak pernah habis.",
       date: "Malam Favorit",
       rotation: 2.5,
@@ -80,7 +80,7 @@ export const birthdayData = {
     },
     {
       id: "mem-3",
-      image: "/images/memory-3.jpg",
+      image: "/images/memory-3.png",
       caption: "Jalan tanpa tujuan pun terasa tenang asal pulangnya sama kamu.",
       date: "Akhir Pekan",
       rotation: -2,
@@ -88,7 +88,7 @@ export const birthdayData = {
     },
     {
       id: "mem-4",
-      image: "/images/memory-4.jpg",
+      image: "/images/memory-4.png",
       caption: "Terima kasih sudah jadi rumah paling teduh di tengah ramai.",
       date: "Selamanya",
       rotation: 3,
