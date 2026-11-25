@@ -21,7 +21,7 @@ export const DREAMY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export const birthdayData = {
   // === 1. IDENTITAS UTAMA & ASET ===
-  partnerName: "Alya",
+  partnerName: "Hani",
   partnerNickname: "Sayang",
   senderName: "Kamu yang Selalu Mengagumimu",
   age: 22,
@@ -99,7 +99,7 @@ export const birthdayData = {
   // === 6. SURAT CINTA & SECRET VOICE NOTE (.MP4 / .MP3) ===
   loveLetter: {
     envelopePrompt: "Ada surat kecil untukmu — ketuk segel untuk membuka",
-    salutation: "Untuk Alya tersayang,",
+    salutation: "Untuk Hani tersayang,",
     paragraphs: [
       "Selamat ulang tahun yang ke-22, ya. Rasanya baru kemarin kita berbagi cerita hal-hal kecil, dan hari ini aku kembali bersyukur karena masih bisa merayakan bertambahnya usiamu dari dekat.",
       "Terima kasih sudah menjadi pribadi yang lembut, anggun, dan tulus. Kehadiranmu diam-diam mengajarkanku banyak hal tentang sabar, tentang merayakan proses, dan tentang merasa cukup.",
